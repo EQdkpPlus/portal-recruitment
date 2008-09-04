@@ -25,5 +25,6 @@ $plang = array_merge($plang, array(
   'recruitment'             => 'Spielersuche',
   'recruitment_open'        => 'Wir suchen Member',
   'recruitment_contact'     => 'bewerben',
+  'recruitment_noneed'      => 'Zur Zeit werden keine Mitglieder gesucht.',
 ));
 ?>

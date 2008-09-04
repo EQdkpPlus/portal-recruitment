@@ -25,5 +25,6 @@ $plang = array_merge($plang, array(
   'recruitment'             => 'Recruitment',
   'recruitment_open'        => 'Searcging Members',
   'recruitment_contact'     => 'Apply',
+  'recruitment_noneed'      => 'There are no open slots at the moment.',
 ));
 ?>
