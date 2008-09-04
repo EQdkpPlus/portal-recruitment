@@ -58,24 +58,27 @@ if(!function_exists(recruitment_module))
 			{
 				$i = 0 ;
 				$specs = $user->lang['talents'][renameClasstoenglish($row['class_name'])] ;
-				foreach ($specs as $specname)
-				{
-					$i++;
-					$classCount = $conf_plus['pk_recruitment_class['.$row['class_id'].']['.$i.']'] ;
-			   		if ($classCount > 0)
-			   	  	{
-			   	  		$rowcolor = $eqdkp->switch_row_class();
-			   	  		$c_color = renameClasstoenglish($row['class_name']);				   		
-				   		$img = $eqdkp_root_path."games/WoW/talents/".strtolower(renameClasstoenglish($row['class_name'])).($i-1).".png" ;
-				   		$icon= "<img src='".$img."'>" ;
-				   		$showntext = $html->ToolTip($specname.' - '.$row['class_name'],$icon.get_ClassIcon($row['class_name']).' '.$row['class_name'],$icon) ;
-			   	  		$recruit .=
-			   	  					'<tr class="'.$rowcolor.'" nowrap onmouseover="this.className=\'rowHover\';" onmouseout="this.className=\''.$rowcolor.'\';">'.
-			   	  		 			'<td class="'.$c_color.'">'.$showntext.'</td>
-			   	  						 					   <td>'. $classCount. '</td>
-			   	  					</tr>';
-			   	  		$show =true ;
-			   	  	}
+  			if(is_array($specs))
+  			{
+          foreach ($specs as $specname)
+  				{
+  					$i++;
+  					$classCount = $conf_plus['pk_recruitment_class['.$row['class_id'].']['.$i.']'] ;
+  			   		if ($classCount > 0)
+  			   	  	{
+  			   	  		$rowcolor = $eqdkp->switch_row_class();
+  			   	  		$c_color = renameClasstoenglish($row['class_name']);				   		
+  				   		$img = $eqdkp_root_path."games/WoW/talents/".strtolower(renameClasstoenglish($row['class_name'])).($i-1).".png" ;
+  				   		$icon= "<img src='".$img."'>" ;
+  				   		$showntext = $html->ToolTip($specname.' - '.$row['class_name'],$icon.get_ClassIcon($row['class_name']).' '.$row['class_name'],$icon) ;
+  			   	  		$recruit .=
+  			   	  					'<tr class="'.$rowcolor.'" nowrap onmouseover="this.className=\'rowHover\';" onmouseout="this.className=\''.$rowcolor.'\';">'.
+  			   	  		 			'<td class="'.$c_color.'">'.$showntext.'</td>
+  			   	  						 					   <td>'. $classCount. '</td>
+  			   	  					</tr>';
+  			   	  		$show =true ;
+  			   	  	}
+  				}
 				}
 			}else
 			{			
