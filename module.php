@@ -24,7 +24,7 @@ if ( !defined('EQDKP_INC') ){
 $portal_module['recruitment'] = array(
 			'name'			    => 'Recruitment Module',
 			'path'			    => 'recruitment',
-			'version'		    => '1.0.2',
+			'version'		    => '1.0.3',
 			'author'        => 'Corgan',
 			'contact'		    => 'http://www.eqdkp-plus.com',
 			'description'   => 'Searching for Members',
@@ -111,9 +111,11 @@ if(!function_exists(recruitment_module))
   
   	   	$recruit .= '<tr class="'.$rowcolor.'"><td colspan=2 class="smalltitle" align="center">'.$url.$plang['recruitment_contact'].' </a></td></tr>';
   	   	$recruit .= ' </table>';
-  	   	if ($show) {
-  			return $recruit;
-  	   	}
+    if ($show) {
+      return $recruit;
+    }else{
+      return $plang['recruitment_noneed'];
+    }
   }
 }
 ?>
