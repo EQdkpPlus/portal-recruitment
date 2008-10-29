@@ -67,7 +67,7 @@ if(!function_exists(recruitment_module))
   			   		if ($classCount > 0)
   			   	  	{
   			   	  		$rowcolor = $eqdkp->switch_row_class();
-  			   	  		$c_color = renameClasstoenglish($row['class_name']);				   		
+  			   	  		$c_color = str_replace(' ','',renameClasstoenglish($row['class_name']));				   		
   				   		$img = $eqdkp_root_path."games/WoW/talents/".str_replace(' ', '',strtolower(renameClasstoenglish($row['class_name']))).($i-1).".png" ;
   				   		$icon= "<img src='".$img."'>" ;
   				   		$showntext = $html->ToolTip($specname.' - '.$row['class_name'],$icon.get_ClassIcon($row['class_name']).' '.$row['class_name'],$icon) ;
@@ -85,7 +85,7 @@ if(!function_exists(recruitment_module))
 				if ($conf_plus['pk_recruitment_class['.$row['class_id'].']'] > 0)
 			  	{
 			  		$rowcolor = $eqdkp->switch_row_class();
-			  		$c_color = renameClasstoenglish($row['class_name']);
+			  		$c_color = str_replace(' ','',renameClasstoenglish($row['class_name']));
 			  		$recruit .= '<tr class="'.$rowcolor.'"><td class="'.$c_color.'">'.get_ClassIcon($row['class_name'],$row['class_id']).' '.$row['class_name'].'</td>
 			  						 					   <td>'. $conf_plus['pk_recruitment_class['.$row['class_id'].']']. '</td>
 			  					</tr>';
