@@ -44,7 +44,7 @@ if(!function_exists(recruitment_module))
 {
 	function recruitment_module()
   	{
-  		global $conf_plus,$db,$user,$tpl,$eqdkp,$user,$eqdkp_root_path,$html, $plang;
+  		global $conf_plus,$db,$user,$tpl,$eqdkp,$user,$eqdkp_root_path,$html, $plang,$pm;
   
    		$sql = 'SELECT class_name , class_id
         	   	FROM '.CLASS_TABLE.' group by class_name ORDER BY class_name';
@@ -109,6 +109,12 @@ if(!function_exists(recruitment_module))
   	   	else
   	   	{
   	   		$url = '<a href="mailto:'.$conf_plus['pk_contact_email'].'">';
+  	   		
+    		if ($pm->check(PLUGIN_INSTALLED, 'guildrequest'))
+			{
+				$path = $eqdkp_root_path.'plugins/guildrequest/writerequest.php' ;
+				$url = '<a href="'.$path.'">';	
+			}
   	   	}
   
   	   	$recruit .= '<tr class="'.$rowcolor.'"><td colspan=2 class="smalltitle" align="center">'.$url.$plang['recruitment_contact'].' </a></td></tr>';
