@@ -24,12 +24,12 @@ if ( !defined('EQDKP_INC') ){
 $portal_module['recruitment'] = array(
 			'name'			    => 'Recruitment Module',
 			'path'			    => 'recruitment',
-			'version'		    => '1.0.3',
-			'author'        => 'Corgan',
+			'version'		    => '1.0.4',
+			'author'        	=> 'Corgan',
 			'contact'		    => 'http://www.eqdkp-plus.com',
-			'description'   => 'Searching for Members',
-			'positions'     => array('left1', 'left2', 'right'),
-      'install'       => array(
+			'description'   	=> 'Searching for Members',
+			'positions'     	=> array('left1', 'left2', 'right'),
+      		'install'       	=> array(
 	                          'autoenable'        => '0',
 	                          'defaultposition'   => 'left1',
 	                          'defaultnumber'     => '1',
@@ -70,9 +70,9 @@ if(!function_exists(recruitment_module))
 	  			   	  	{
 	  			   	  		$rowcolor = $eqdkp->switch_row_class();
 	  			   	  		$c_color = str_replace(' ','',renameClasstoenglish($row['class_name']));				   		
-	  				   		$img = $eqdkp_root_path."games/WoW/talents/".str_replace(' ', '',strtolower(renameClasstoenglish($row['class_name']))).($i-1).".png" ;
-	  				   		$icon= "<img src='".$img."'>" ;
-	  				   		$showntext = $html->ToolTip($specname.' - '.$row['class_name'],$icon.get_ClassIcon($row['class_name']).' '.$row['class_name'],$icon) ;
+	  				   		$img = $eqdkp_root_path."games/WoW/talents/".str_replace(' ', '',strtolower(renameClasstoenglish($row['class_name']))).($i-1).".png" ;  				   		
+	  				   		$icon = (file_exists($img)) ? "<img src='".$img."'>" : "" ;	  				   			  				   		
+	  				   		$showntext = $html->ToolTip($specname.' '.$row['class_name'],$icon.get_ClassIcon($row['class_name']).' '.$row['class_name'],$icon) ;
 	  			   	  		$recruit .=
 	  			   	  					'<tr class="'.$rowcolor.'" nowrap onmouseover="this.className=\'rowHover\';" onmouseout="this.className=\''.$rowcolor.'\';">'.
 	  			   	  		 			'<td class="'.$c_color.'">'.$showntext.'</td>
@@ -83,7 +83,7 @@ if(!function_exists(recruitment_module))
 	  				}
 				}
 			}else
-			{			
+			{	
 				if ($conf_plus['pk_recruitment_class['.$row['class_id'].']'] > 0)
 			  	{
 			  		$rowcolor = $eqdkp->switch_row_class();
