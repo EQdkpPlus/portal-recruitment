@@ -47,7 +47,7 @@ if(!function_exists(recruitment_module))
   		global $conf_plus,$db,$user,$tpl,$eqdkp,$user,$eqdkp_root_path,$html, $plang,$pm;
   
    		$sql = 'SELECT class_name , class_id
-        	   	FROM '.CLASS_TABLE.' group by class_name ORDER BY class_name';
+        	   	FROM __classes group by class_name ORDER BY class_name';
   
     	$result = $db->query($sql);  
     	$recruit = '<table width="100%" border="0" cellspacing="1" cellpadding="2" class="noborder">';
