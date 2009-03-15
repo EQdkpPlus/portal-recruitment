@@ -44,7 +44,16 @@ if(!function_exists(recruitment_module))
 {
 	function recruitment_module()
   	{
-  		global $conf_plus,$db,$user,$tpl,$eqdkp,$user,$eqdkp_root_path,$html, $plang,$pm;
+  		global $conf_plus,$db,$user,$tpl,$eqdkp,$user,$eqdkp_root_path,$html, $plang,$pm,$pcache;
+	  		
+		// RSS Feed
+		include_once($eqdkp_root_path."libraries/UniversalFeedCreator/UniversalFeedCreator.class.php");
+		$rss = new UniversalFeedCreator();
+		
+		$rss->title           = "Recruitment";
+		$rss->description     = $eqdkp->config['main_title']." EQdkp-Plus - looking for members" ;
+		$rss->link            = $pcache->BuildLink();
+		$rss->syndicationURL  = $pcache->BuildLink().$_SERVER['PHP_SELF'];  		
   
    		$sql = 'SELECT class_name , class_id
         	   	FROM __classes group by class_name ORDER BY class_name';
@@ -52,6 +61,27 @@ if(!function_exists(recruitment_module))
     	$result = $db->query($sql);  
     	$recruit = '<table width="100%" border="0" cellspacing="1" cellpadding="2" class="noborder">';
   
+  	   	if (strlen($conf_plus['pk_recruitment_url']) > 1) 
+  	   	{
+  	   		if($conf_plus['pk_recruitment_url_emb']==1)
+	  	   	{
+	  	   		$url = '<a href="'.$eqdkp_root_path.'wrapper.php?id=recemb">' ;
+	  	   	}else {
+	  	   		$url = '<a href="'.$conf_plus['pk_recruitment_url'].'">' ;	
+	  	   	}
+  	   		
+  	   	}  	   	
+  	   	else
+  	   	{
+  	   		$url = '<a href="mailto:'.$conf_plus['pk_contact_email'].'">';
+  	   		
+    		if ($pm->check(PLUGIN_INSTALLED, 'guildrequest'))
+			{
+				$path = $eqdkp_root_path.'plugins/guildrequest/writerequest.php' ;
+				$url = '<a href="'.$path.'">';	
+			}
+  	   	}    	
+    	
 		while ( $row = $db->fetch_record($result) )
 		{
 			if($eqdkp->config['default_game'] == 'WoW' and ($row['class_name'] <> 'Unknown' ))
@@ -79,9 +109,27 @@ if(!function_exists(recruitment_module))
 	  			   	  						 					   <td>'. $classCount. '</td>
 	  			   	  					</tr>';
 	  			   	  		$show =true ;
+	  			   	  		
+						    //Create RSS
+
+						          $rssitem = new FeedItem();
+						          $rssitem->title        = stripslashes($row['class_name']) ;
+						          $rssitem->link         = $url;
+						          $rssitem->description  = $showntext;
+
+						          
+						          $additionals = array('comments_counter'  => $comcount,	        					 
+						          					'comments_active'  => $SHOWCOMMENT,	        					       					 	       
+						          );
+						          					  					 
+						          $rssitem->additionalElements = $additionals;
+						          
+						          $rss->addItem($rssitem);    
+  			   	  		
+			  			   	  		
 	  			   	  	}
 	  				}
-				}
+				}								
 			}else
 			{	
 				if ($conf_plus['pk_recruitment_class['.$row['class_id'].']'] > 0)
@@ -95,27 +143,9 @@ if(!function_exists(recruitment_module))
 			  	}
 			}
 		}
+		$rss->saveFeed("RSS2.0", $pcache->FilePath('recruitment.xml', 'eqdkp'),false);
   
-  	   	if (strlen($conf_plus['pk_recruitment_url']) > 1) 
-  	   	{
-  	   		if($conf_plus['pk_recruitment_url_emb']==1)
-	  	   	{
-	  	   		$url = '<a href="'.$eqdkp_root_path.'wrapper.php?id=recemb">' ;
-	  	   	}else {
-	  	   		$url = '<a href="'.$conf_plus['pk_recruitment_url'].'">' ;	
-	  	   	}
-  	   		
-  	   	}  	   	
-  	   	else
-  	   	{
-  	   		$url = '<a href="mailto:'.$conf_plus['pk_contact_email'].'">';
-  	   		
-    		if ($pm->check(PLUGIN_INSTALLED, 'guildrequest'))
-			{
-				$path = $eqdkp_root_path.'plugins/guildrequest/writerequest.php' ;
-				$url = '<a href="'.$path.'">';	
-			}
-  	   	}
+
   
   	   	$recruit .= '<tr class="'.$rowcolor.'"><td colspan=2 class="smalltitle" align="center">'.$url.$plang['recruitment_contact'].' </a></td></tr>';
   	   	$recruit .= ' </table>';
