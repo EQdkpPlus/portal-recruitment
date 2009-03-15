@@ -61,26 +61,30 @@ if(!function_exists(recruitment_module))
     	$result = $db->query($sql);  
     	$recruit = '<table width="100%" border="0" cellspacing="1" cellpadding="2" class="noborder">';
   
+    	//show Link URL 	
   	   	if (strlen($conf_plus['pk_recruitment_url']) > 1) 
   	   	{
   	   		if($conf_plus['pk_recruitment_url_emb']==1)
 	  	   	{
-	  	   		$url = '<a href="'.$eqdkp_root_path.'wrapper.php?id=recemb">' ;
-	  	   	}else {
-	  	   		$url = '<a href="'.$conf_plus['pk_recruitment_url'].'">' ;	
+	  	   		$path = $eqdkp_root_path.'wrapper.php?id=recemb' ;
+	  	   	}else 
+	  	   	{
+	  	   		$path = $conf_plus['pk_recruitment_url'] ;	
 	  	   	}
   	   		
   	   	}  	   	
-  	   	else
+  	   	else //Link URL -> Email / guildrequest plugin
   	   	{
-  	   		$url = '<a href="mailto:'.$conf_plus['pk_contact_email'].'">';
+  	   		$path = "mailto:".$conf_plus['pk_contact_email'];
   	   		
     		if ($pm->check(PLUGIN_INSTALLED, 'guildrequest'))
 			{
-				$path = $eqdkp_root_path.'plugins/guildrequest/writerequest.php' ;
-				$url = '<a href="'.$path.'">';	
+				$path = $eqdkp_root_path.'plugins/guildrequest/writerequest.php' ;				
 			}
-  	   	}    	
+  	   	}   
+  	   	
+  	   	$url = '<a href="'.$path.'">' ;	
+
     	
 		while ( $row = $db->fetch_record($result) )
 		{
@@ -111,26 +115,24 @@ if(!function_exists(recruitment_module))
 	  			   	  		$show =true ;
 	  			   	  		
 						    //Create RSS
-
-						          $rssitem = new FeedItem();
-						          $rssitem->title        = stripslashes($row['class_name']) ;
-						          $rssitem->link         = $url;
-						          $rssitem->description  = $showntext;
-
-						          
-						          $additionals = array('comments_counter'  => $comcount,	        					 
-						          					'comments_active'  => $SHOWCOMMENT,	        					       					 	       
-						          );
-						          					  					 
-						          $rssitem->additionalElements = $additionals;
-						          
-						          $rss->addItem($rssitem);    
-  			   	  		
-			  			   	  		
+					          $rssitem = new FeedItem();
+					          $rssitem->title        = $classCount. " " .$specname. " " .stripslashes($row['class_name']) ;
+					          $rssitem->link         = preg_replace("/\.\//ms", $pcache->BuildLink(),$path,1);
+					          $rssitem->description  = $classCount. " " .$specname. " " .stripslashes($row['class_name']) ;
+					          
+					          $additionals = array('class_name'  => stripslashes($row['class_name']),	        					 
+					          					  'class_count'  => $classCount,	        					       					 	       
+					          					  'class_spec'  => $specname,	        					       					 	       
+					          					  'class_icon'  =>  "<![CDATA[".str_replace('../','',preg_replace("/\.\//ms", $pcache->BuildLink(),get_ClassIcon($row['class_name']),1))."]]>",	        					       					 	       
+					          					  'spec_icon'  =>  "<![CDATA[".preg_replace("/\.\//ms", $pcache->BuildLink(),$img,1)."]]>" ,	        					       					 	       
+					          );
+					          					  					 
+					          $rssitem->additionalElements = $additionals;						          
+					          $rss->addItem($rssitem);    	  		
 	  			   	  	}
 	  				}
 				}								
-			}else
+			}else // all other games
 			{	
 				if ($conf_plus['pk_recruitment_class['.$row['class_id'].']'] > 0)
 			  	{
@@ -140,13 +142,23 @@ if(!function_exists(recruitment_module))
 			  						 					   <td>'. $conf_plus['pk_recruitment_class['.$row['class_id'].']']. '</td>
 			  					</tr>';
 			  		$show =true ;
+				    //Create RSS
+			          $rssitem = new FeedItem();
+			          $rssitem->title        = $classCount. " " .stripslashes($row['class_name']) ;
+			          $rssitem->link         = preg_replace("/\.\//ms", $pcache->BuildLink(),$path,1);
+			          $rssitem->description  = $classCount. " " .stripslashes($row['class_name']) ;
+			          
+			          $additionals = array('class_name'  => stripslashes($row['class_name']),	        					 
+			          					  'class_count'  => $classCount,	        					       					 	       
+			          					  'class_icon'  =>  "<![CDATA[".str_replace('../','',preg_replace("/\.\//ms", $pcache->BuildLink(),get_ClassIcon($row['class_name'],$row['class_id']),1))."]]>", 		 
+			          );			          					  			
+			          
+			          $rssitem->additionalElements = $additionals;						          
+			          $rss->addItem($rssitem);  			  		
 			  	}
-			}
+			}						
 		}
-		$rss->saveFeed("RSS2.0", $pcache->FilePath('recruitment.xml', 'eqdkp'),false);
-  
-
-  
+		$rss->saveFeed("RSS2.0", $pcache->FilePath('recruitment.xml', 'eqdkp'),false);  
   	   	$recruit .= '<tr class="'.$rowcolor.'"><td colspan=2 class="smalltitle" align="center">'.$url.$plang['recruitment_contact'].' </a></td></tr>';
   	   	$recruit .= ' </table>';
     if ($show) {
