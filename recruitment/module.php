@@ -12,7 +12,7 @@
  * @link        http://eqdkp-plus.com
  * @package     eqdkp-plus
  * @version     $Rev$
- * 
+ *
  * $Id$
  */
 
@@ -44,121 +44,99 @@ if(!function_exists(recruitment_module))
 {
 	function recruitment_module()
   	{
-  		global $conf_plus,$db,$user,$tpl,$eqdkp,$user,$eqdkp_root_path,$html, $plang,$pm,$pcache;
-	  		
+  		global $conf_plus,$db,$user,$tpl,$eqdkp,$user,$eqdkp_root_path,$html, $plang,$pm,$pcache, $game;
+
 		// RSS Feed
 		include_once($eqdkp_root_path."libraries/UniversalFeedCreator/UniversalFeedCreator.class.php");
 		$rss = new UniversalFeedCreator();
-		
+
 		$rss->title           = "Recruitment";
 		$rss->description     = $eqdkp->config['main_title']." EQdkp-Plus - looking for members" ;
 		$rss->link            = $pcache->BuildLink();
-		$rss->syndicationURL  = $pcache->BuildLink().$_SERVER['PHP_SELF'];  		
-  
-   		$sql = 'SELECT class_name , class_id
-        	   	FROM __classes group by class_name ORDER BY class_name';
-  
-    	$result = $db->query($sql);  
+		$rss->syndicationURL  = $pcache->BuildLink().$_SERVER['PHP_SELF'];
+
     	$recruit = '<table width="100%" border="0" cellspacing="1" cellpadding="2" class="noborder">';
-  
-    	//show Link URL 	
-  	   	if (strlen($conf_plus['pk_recruitment_url']) > 1) 
+
+    	//show Link URL
+  	   	if (strlen($conf_plus['pk_recruitment_url']) > 1)
   	   	{
   	   		if($conf_plus['pk_recruitment_url_emb']==1)
 	  	   	{
 	  	   		$path = $eqdkp_root_path.'wrapper.php?id=recemb' ;
-	  	   	}else 
+	  	   	}else
 	  	   	{
-	  	   		$path = $conf_plus['pk_recruitment_url'] ;	
+	  	   		$path = $conf_plus['pk_recruitment_url'] ;
 	  	   	}
-  	   		
-  	   	}  	   	
+
+  	   	}
   	   	else //Link URL -> Email / guildrequest plugin
   	   	{
   	   		$path = "mailto:".$conf_plus['pk_contact_email'];
-  	   		
+
     		if ($pm->check(PLUGIN_INSTALLED, 'guildrequest'))
 			{
-				$path = $eqdkp_root_path.'plugins/guildrequest/writerequest.php' ;				
+				$path = $eqdkp_root_path.'plugins/guildrequest/writerequest.php' ;
 			}
-  	   	}   
-  	   	
-  	   	$url = '<a href="'.$path.'">' ;	
+  	   	}
 
-    	
-		while ( $row = $db->fetch_record($result) )
-		{
-			if($eqdkp->config['default_game'] == 'WoW' and ($row['class_name'] <> 'Unknown' ))
-			{
-				$i = 0 ;
-				$specs = $user->lang['talents'][renameClasstoenglish($row['class_name'])] ;
-				$specs[] = "";
-				
-  				if(is_array($specs))
-  				{
-	          		foreach ($specs as $specname)
-	  				{
-	  					$i++;
-	  					$classCount = $conf_plus['pk_recruitment_class['.$row['class_id'].']['.$i.']'] ;
-	  			   		if ($classCount > 0)
-	  			   	  	{
-	  			   	  		$rowcolor = $eqdkp->switch_row_class();
-	  			   	  		$c_color = str_replace(' ','',renameClasstoenglish($row['class_name']));				   		
-	  				   		$img = $eqdkp_root_path."games/WoW/talents/".str_replace(' ', '',strtolower(renameClasstoenglish($row['class_name']))).($i-1).".png" ;  				   		
-	  				   		$icon = (file_exists($img)) ? "<img src='".$img."'>" : "" ;	  				   			  				   		
-	  				   		$showntext = $html->ToolTip($specname.' '.$row['class_name'],$icon.get_ClassIcon($row['class_name']).' '.$row['class_name'],$icon) ;
-	  			   	  		$recruit .=
-	  			   	  					'<tr class="'.$rowcolor.'" nowrap onmouseover="this.className=\'rowHover\';" onmouseout="this.className=\''.$rowcolor.'\';">'.
-	  			   	  		 			'<td class="'.$c_color.'">'.$showntext.'</td>
-	  			   	  						 					   <td>'. $classCount. '</td>
-	  			   	  					</tr>';
-	  			   	  		$show =true ;
-	  			   	  		
-						    //Create RSS
-					          $rssitem = new FeedItem();
-					          $rssitem->title        = $classCount. " " .$specname. " " .stripslashes($row['class_name']) ;
-					          $rssitem->link         = preg_replace("/\.\//ms", $pcache->BuildLink(),$path,1);
-					          $rssitem->description  = $classCount. " " .$specname. " " .stripslashes($row['class_name']) ;
-					          
-					          $additionals = array('class_name'  => stripslashes($row['class_name']),	        					 
-					          					  'class_count'  => $classCount,	        					       					 	       
-					          					  'class_spec'  => $specname,	        					       					 	       
-					          					  'class_icon'  =>  "<![CDATA[".str_replace('../','',preg_replace("/\.\//ms", $pcache->BuildLink(),get_ClassIcon($row['class_name']),1))."]]>",	        					       					 	       
-					          					  'spec_icon'  =>  "<![CDATA[".preg_replace("/\.\//ms", $pcache->BuildLink(),$img,1)."]]>" ,	        					       					 	       
-					          );
-					          					  					 
-					          $rssitem->additionalElements = $additionals;						          
-					          $rss->addItem($rssitem);    	  		
-	  			   	  	}
-	  				}
-				}								
-			}else // all other games
-			{	
-				if ($conf_plus['pk_recruitment_class['.$row['class_id'].']'] > 0)
-			  	{
-			  		$rowcolor = $eqdkp->switch_row_class();
-			  		$c_color = str_replace(' ','',renameClasstoenglish($row['class_name']));
-			  		$recruit .= '<tr class="'.$rowcolor.'"><td class="'.$c_color.'">'.get_ClassIcon($row['class_name'],$row['class_id']).' '.$row['class_name'].'</td>
-			  						 					   <td>'. $conf_plus['pk_recruitment_class['.$row['class_id'].']']. '</td>
+  	   	$url = '<a href="'.$path.'">' ;
+
+		foreach($game->get('classes') as $class_id => $class_name) {
+			if($game->icon_exists('talents')) {
+				if(is_array($game->glang('talents'))) {
+					$talents = $game->glang('talents');
+					foreach($talents[$class_id] as $talent_id => $talent_name) {
+	  					$classCount = $conf_plus['pk_recruitment_class['.$class_id.']['.$talent_id.']'] ;
+	  					$rowcolor = $eqdkp->switch_row_class();
+	  					$icon = $game->decorate('talents', array($class_id, $talent_id));
+	  					$showntext = $html->ToolTip($talent_name.' '.$class_name, $icon.$game->decorate('classes', array($class_id)).' '.$class_name,$icon) ;
+		   				$recruit .= '<tr class="'.$rowcolor.'" nowrap onmouseover="this.className=\'rowHover\';" onmouseout="this.className=\''.$rowcolor.'\';">';
+		   	   			$recruit .= '<td class="class_'.$class_id.'">'.$showntext.'</td>';
+			   			$recruit .= '<td>'. $classCount. '</td></tr>';
+						//Create RSS
+						$rssitem = new FeedItem();
+						$rssitem->title        = $classCount. " " .$talent_name. " " .$class_name ;
+						$rssitem->link         = preg_replace("/\.\//ms", $pcache->BuildLink(),$path,1);
+						$rssitem->description  = $classCount. " " .$talent_name. " " .$class_name;
+
+						$additionals = array(
+							'class_name'  => $class_name,
+					    	'class_count'  => $classCount,
+					    	'class_spec'  => $talent_name,
+					    	'class_icon'  =>  "<![CDATA[".str_replace('../','',preg_replace("/\.\//ms", $pcache->BuildLink(),$game->decorate('classes', array($class_id)),1))."]]>",
+					    	'spec_icon'  =>  "<![CDATA[".preg_replace("/\.\//ms", $pcache->BuildLink(),$game->decorate('talents', array($class_id, $talent_id, true)),1)."]]>" ,
+						);
+						$rssitem->additionalElements = $additionals;
+						$rss->addItem($rssitem);
+			   		}
+				}
+			} else {
+				$classCount = $conf_plus['pk_recruitment_class['.$class_id.']'];
+				if ($classCount > 0)
+			   {
+					$rowcolor = $eqdkp->switch_row_class();
+			  		$recruit .= '<tr class="'.$rowcolor.'"><td class="class_'.$class_id.'">'.$game->decorate('classes', array($class_id)).' '.$class_name.'</td>
+			  						 					   <td>'. $conf_plus['pk_recruitment_class['.$class_id.']']. '</td>
 			  					</tr>';
 			  		$show =true ;
-				    //Create RSS
-			          $rssitem = new FeedItem();
-			          $rssitem->title        = $classCount. " " .stripslashes($row['class_name']) ;
-			          $rssitem->link         = preg_replace("/\.\//ms", $pcache->BuildLink(),$path,1);
-			          $rssitem->description  = $classCount. " " .stripslashes($row['class_name']) ;
-			          
-			          $additionals = array('class_name'  => stripslashes($row['class_name']),	        					 
-			          					  'class_count'  => $classCount,	        					       					 	       
-			          					  'class_icon'  =>  "<![CDATA[".str_replace('../','',preg_replace("/\.\//ms", $pcache->BuildLink(),get_ClassIcon($row['class_name'],$row['class_id']),1))."]]>", 		 
-			          );			          					  			
-			          
-			          $rssitem->additionalElements = $additionals;						          
-			          $rss->addItem($rssitem);  			  		
-			  	}
-			}						
-		}
-		$rss->saveFeed("RSS2.0", $pcache->FilePath('recruitment.xml', 'eqdkp'),false);  
+					//Create RSS
+			    	$rssitem = new FeedItem();
+			    	$rssitem->title        = $classCount. " " .$class_name;
+			    	$rssitem->link         = preg_replace("/\.\//ms", $pcache->BuildLink(),$path,1);
+			    	$rssitem->description  = $classCount. " " .$class_name;
+			        
+			    	$additionals = array(
+			    		'class_name'  => $class_name,
+			        	'class_count'  => $classCount,
+			        	'class_icon'  =>  "<![CDATA[".str_replace('../','',preg_replace("/\.\//ms", $pcache->BuildLink(),$game->decorate('classes', array($class_id)),$class_id),1))."]]>",
+			    	);
+
+			    	$rssitem->additionalElements = $additionals;
+			    	$rss->addItem($rssitem);
+				}
+	   		}
+   		}
+		$rss->saveFeed("RSS2.0", $pcache->FilePath('recruitment.xml', 'eqdkp'),false);
   	   	$recruit .= '<tr class="'.$rowcolor.'"><td colspan=2 class="smalltitle" align="center">'.$url.$plang['recruitment_contact'].' </a></td></tr>';
   	   	$recruit .= ' </table>';
     if ($show) {
