@@ -23,7 +23,7 @@ if ( !defined('EQDKP_INC') ){
 
 $plang = array_merge($plang, array(
   'recruitment'             => 'Recruitment',
-  'recruitment_open'        => 'Searcging Members',
+  'recruitment_open'        => 'Searching Members',
   'recruitment_contact'     => 'Apply',
   'recruitment_noneed'      => 'There are no open slots at the moment.',
 ));
