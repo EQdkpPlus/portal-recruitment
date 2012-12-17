@@ -22,7 +22,7 @@ if ( !defined('EQDKP_INC') ){
 
 class recruitment_portal extends portal_generic {
 	public static function __shortcuts() {
-		$shortcuts = array('user', 'pdc', 'core', 'html', 'game', 'tpl', 'pm', 'config', 'crypt' => 'encrypt');
+		$shortcuts = array('user', 'pdc', 'core', 'html', 'game', 'tpl', 'pm', 'config', 'crypt' => 'encrypt', 'pdh');
 		return array_merge(parent::$shortcuts, $shortcuts);
 	}
 
@@ -81,6 +81,13 @@ class recruitment_portal extends portal_generic {
 				'property'	=> 'checkbox',
 				'javascript'=> 'onchange="load_settings()"',
 			),
+			'pm_recruitment_talentsorroles'	=> array(
+				'name'		=> 'pm_recruitment_talentsorroles',
+				'language'	=> 'pm_recruitment_talentsorroles',
+				'property'	=> 'dropdown',
+				'options'	=> array('talents'=> $this->user->lang('pm_recruitment_talents'), 'roles'=>$this->user->lang('pm_recruitment_roles')),
+				'javascript'=> 'onchange="load_settings()"',
+			),
 		);
 	
 		$priority_dropdown = array(
@@ -93,7 +100,7 @@ class recruitment_portal extends portal_generic {
 		$classes = $this->game->get('classes');
 		foreach($classes as $class_id => $class_name) {
 			if($class_id != 0) { //filter unknown
-				if($this->game->icon_exists('talents')) {
+				if($this->game->icon_exists('talents') && $this->config->get('pm_recruitment_talentsorroles') == 'talents') {
 					
 					if ((int)$this->config->get('pm_recruitment_priority') == 1){
 						$settings[] = array(
@@ -135,6 +142,50 @@ class recruitment_portal extends portal_generic {
 						} // end if is array
 					} //close talents
 					
+				} elseif ($this->config->get('pm_recruitment_talentsorroles') == 'roles' && count($this->pdh->get('roles', 'id_list', array())) > 0){
+				//Roles
+					if ((int)$this->config->get('pm_recruitment_priority') == 1){
+						$settings[] = array(
+							'name'			=> 'pm_recruitment_class_'.$class_id,
+							'language'		=> $this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id),
+							'property'		=>	'dropdown',
+							'options'		=> $priority_dropdown,
+						);
+					} else {
+						$settings[] = array(
+							'name'			=> 'pm_recruitment_class_'.$class_id,
+							'language'		=> $this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id),
+							'property'		=> 'text',
+							'size'			=> 3,
+						);
+					}
+					
+					if($class_id != 0) { //filter unknown
+						$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
+						
+						if(is_array($arrRoles)){
+							foreach($arrRoles as $role_id => $role_name) {
+								
+								if ((int)$this->config->get('pm_recruitment_priority') == 1){
+									$settings[] = array(
+										'name'		=>	'pm_recruitment_class_'.$class_id.'_'.$role_id,
+										'language'	=>	$this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id).' - '.$this->game->decorate('roles', array($role_id)).$role_name,
+										'property'	=>	'dropdown',
+										'options'	=> $priority_dropdown,
+									);
+								} else {
+									$settings[] = array(
+										'name'		=>	'pm_recruitment_class_'.$class_id.'_'.$role_id,
+										'language'	=>	$this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id).' - '.$this->game->decorate('roles', array($role_id)).$role_name,
+										'property'	=>	'text',
+										'size'		=> 3,
+									);
+								}
+							} //close foreach
+						}
+					}
+				
+				//Just plain classes
 				} else {
 					if ((int)$this->config->get('pm_recruitment_priority') == 1){
 						$settings[] = array(
@@ -162,8 +213,8 @@ class recruitment_portal extends portal_generic {
 			$recruit = '<table width="100%" border="0" cellspacing="1" cellpadding="2" class="noborder colorswitch hoverrows">';
 
 			//show Link URL
+			$target = '';
 			if (strlen($this->config->get('pm_recruitment_url')) > 1) {
-				$target = '';
 				switch ($this->config->get('pm_recruitment_embed')){
 					case '0':  $path = $this->config->get('pm_recruitment_url');
 						break ;
@@ -187,7 +238,7 @@ class recruitment_portal extends portal_generic {
 			$show = false;
 			foreach($classes as $class_id => $class_name) {
 				if($class_id != 0) { //filter unknown
-					if($this->game->icon_exists('talents')) {
+					if($this->game->icon_exists('talents') && $this->config->get('pm_recruitment_talentsorroles') == 'talents') {
 						if(is_array($this->game->glang('talents'))) {
 							$talents = $this->game->glang('talents');
 							$talentOut = '';
@@ -204,7 +255,7 @@ class recruitment_portal extends portal_generic {
 									} else {
 										if ($this->config->get('pm_recruitment_class_'.$class_id.'_'.$talent_id)> 0){
 											$talentOut .= '<tr>'.
-															'<td class="class_'.$class_id.' nowrap">'.$this->html->ToolTip($talent_name.' '.$this->game->get_name('classes', $class_id), $this->game->decorate('talents', array($class_id, $talent_id)).' '.$this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id)).'</td>
+															'<td class="class_'.$class_id.' nowrap">&nbsp;&nbsp;&nbsp;&nbsp;'.$this->html->ToolTip($talent_name.' '.$this->game->get_name('classes', $class_id), $this->game->decorate('talents', array($class_id, $talent_id)).' '.$this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id)).'</td>
 															<td>'. $this->config->get('pm_recruitment_class_'.$class_id.'_'.$talent_id). '</td>
 														</tr>';
 											$show =true ;
@@ -219,7 +270,7 @@ class recruitment_portal extends portal_generic {
 							if (strlen($this->config->get('pm_recruitment_class_'.$class_id)) || strlen($talentOut)){
 								$recruit .= '<tr>'.
 												'<td class="class_'.$class_id.' nowrap">'.$this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id).'</td>
-												<td><span class="'.$this->handle_cssclass($this->config->get('pm_recruitment_class_'.$class_id.'_'.$talent_id)).'">'. $this->user->lang('recruit_priority_'.$this->config->get('pm_recruitment_class_'.$class_id)). '</span></td>
+												<td><span class="'.$this->handle_cssclass($this->config->get('pm_recruitment_class_'.$class_id)).'">'. $this->user->lang('recruit_priority_'.$this->config->get('pm_recruitment_class_'.$class_id)). '</span></td>
 											</tr>'.$talentOut;
 								$show =true ;
 							}
@@ -232,6 +283,50 @@ class recruitment_portal extends portal_generic {
 								$show =true ;
 							}
 						}
+					} elseif ($this->config->get('pm_recruitment_talentsorroles') == 'roles' && count($this->pdh->get('roles', 'id_list', array())) > 0){
+						$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
+						$rolesOut = '';
+						if(is_array($arrRoles)){
+							foreach($arrRoles as $role_id => $role_name) {
+								
+								if ((int)$this->config->get('pm_recruitment_priority') == 1){
+											if (strlen($this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id))){
+												$rolesOut .= '<tr>'.
+																'<td class="class_'.$class_id.' nowrap small">&nbsp;&nbsp;&nbsp;&nbsp;'.$this->game->decorate('roles', array($role_id)).$role_name.'</td>
+																<td><span class="'.$this->handle_cssclass($this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id)).'">'. $this->user->lang('recruit_priority_'.$this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id)). '</span></td>
+															</tr>';
+												$show =true ;
+											}
+								} else {
+									if ($this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id)> 0){
+										$rolesOut .= '<tr>'.
+														'<td class="class_'.$class_id.' nowrap">&nbsp;&nbsp;&nbsp;&nbsp;'.$this->html->ToolTip($role_name.' '.$this->game->get_name('classes', $class_id), $this->game->decorate('roles', array($role_id)).' '.$role_name).'</td>
+														<td>'. $this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id). '</td>
+													</tr>';
+										$show =true ;
+									}
+								}
+							} //close foreach
+						}
+						
+						if ((int)$this->config->get('pm_recruitment_priority') == 1){
+							if (strlen($this->config->get('pm_recruitment_class_'.$class_id)) || strlen($rolesOut)){
+								$recruit .= '<tr>'.
+												'<td class="class_'.$class_id.' nowrap">'.$this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id).'</td>
+												<td><span class="'.$this->handle_cssclass($this->config->get('pm_recruitment_class_'.$class_id)).'">'. $this->user->lang('recruit_priority_'.$this->config->get('pm_recruitment_class_'.$class_id)). '</span></td>
+											</tr>'.$rolesOut;
+								$show =true ;
+							}
+						} else {
+							if (($this->config->get('pm_recruitment_class_'.$class_id) > 0)  || strlen($rolesOut)){
+								$recruit .= '<tr>'.
+												'<td class="class_'.$class_id.' nowrap">'.$this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id).'</td>
+												<td>'.$this->config->get('pm_recruitment_class_'.$class_id).'</td>
+											</tr>'.$rolesOut;
+								$show =true ;
+							}
+						}
+					
 					} else {
 						if ((int)$this->config->get('pm_recruitment_priority') == 1){
 							if (strlen($this->config->get('pm_recruitment_class_'.$class_id))){

@@ -31,6 +31,9 @@ $lang['recruitment_contact_type_help']	= 'Wenn keine URL angegeben , dann wird a
 $lang['recruit_embedded']				= 'Wie soll die URL geöffnet werden?';
 $lang['recruit_embedded_help']			= 'Wähle aus, wie die eingetragene URL geöffnet werden soll.';
 $lang['recruit_priority']				= 'Prioritäten anstatt Zahlen nutzen?';
+$lang['pm_recruitment_talentsorroles']	= 'Talente oder Rollen anzeigen?';
+$lang['pm_recruitment_talents']	= 'Talente';
+$lang['pm_recruitment_roles']	= 'Rollen';
 
 $lang['recruit_priority_high']			= 'Hoch';
 $lang['recruit_priority_middle']		= 'Mittel';
