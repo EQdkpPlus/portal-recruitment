@@ -35,4 +35,8 @@ $lang['recruit_priority']				= 'Use priority instead of numbers';
 $lang['recruit_priority_high']			= 'high';
 $lang['recruit_priority_middle']		= 'medium';
 $lang['recruit_priority_low']			= 'low';
+
+$lang['pm_recruitment_talentsorroles']	= 'Talents or Roles?';
+$lang['pm_recruitment_talents']	= 'Talents';
+$lang['pm_recruitment_roles']	= 'Roles';
 ?>
