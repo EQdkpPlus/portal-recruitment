@@ -29,7 +29,7 @@ class recruitment_portal extends portal_generic {
 	protected $path		= 'recruitment';
 	protected $data		= array(
 		'name'			=> 'Recruitment Module',
-		'version'		=> '1.1.0',
+		'version'		=> '1.1.1',
 		'author'		=> 'Corgan',
 		'contact'		=> EQDKP_PROJECT_URL,
 		'description'	=> 'Searching for Members',
@@ -230,7 +230,7 @@ class recruitment_portal extends portal_generic {
 			}else{		//Link URL -> Email / guildrequest plugin
 				$path = "mailto:".$this->crypt->decrypt($this->config->get('admin_email'));
 				if ($this->pm->check('guildrequest', PLUGIN_INSTALLED)){
-					$path = $this->root_path.'plugins/guildrequest/writerequest.php' ;
+					$path = $this->root_path.'plugins/guildrequest/addrequest.php'.$this->SID ;
 				}
 			}
 			$url = '<a href="'.$path.'" '.$target.'>' ;
