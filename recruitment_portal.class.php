@@ -52,7 +52,7 @@ class recruitment_portal extends portal_generic {
 	
 
 	
-	public function get_settings(){
+	public function get_settings($state){
 		$a_linkMode= array(
 			'0'				=> $this->user->lang('pk_set_link_type_self'),
 			'1'				=> $this->user->lang('pk_set_link_type_link'),
