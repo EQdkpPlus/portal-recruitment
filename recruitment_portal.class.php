@@ -22,7 +22,7 @@ if ( !defined('EQDKP_INC') ){
 
 class recruitment_portal extends portal_generic {
 	public static function __shortcuts() {
-		$shortcuts = array('user', 'pdc', 'core', 'html', 'game', 'tpl', 'pm', 'config', 'crypt' => 'encrypt', 'pdh');
+		$shortcuts = array('user', 'pdc', 'core', 'html', 'game', 'tpl', 'pm', 'config', 'crypt' => 'encrypt', 'pdh', 'routing');
 		return array_merge(parent::$shortcuts, $shortcuts);
 	}
 
@@ -223,7 +223,7 @@ class recruitment_portal extends portal_generic {
 						break ;
 					case '2':
 					case '3':
-					case '4':  $path = $this->root_path.'wrapper.php'.$this->SID.'&amp;id=recruitment';
+					case '4':  $path = $this->routing->build('external', 'recruitment');
 						break ;
 				}
 							
@@ -247,7 +247,7 @@ class recruitment_portal extends portal_generic {
 									if ((int)$this->config->get('pm_recruitment_priority') == 1){
 										if (strlen($this->config->get('pm_recruitment_class_'.$class_id.'_'.$talent_id))){
 											$talentOut .= '<tr>'.
-															'<td class="class_'.$class_id.' nowrap small">&nbsp;&nbsp;&nbsp;&nbsp;'.$this->game->decorate('talents', array($class_id, $talent_id)).$talent_name.'</td>
+															'<td class="class_'.$class_id.' nowrap small">&nbsp;&nbsp;&nbsp;&nbsp;'.$this->game->decorate('talents', array($class_id, $talent_id)).' '.$talent_name.'</td>
 															<td><span class="'.$this->handle_cssclass($this->config->get('pm_recruitment_class_'.$class_id.'_'.$talent_id)).'">'. $this->user->lang('recruit_priority_'.$this->config->get('pm_recruitment_class_'.$class_id.'_'.$talent_id)). '</span></td>
 														</tr>';
 											$show =true ;
@@ -292,7 +292,7 @@ class recruitment_portal extends portal_generic {
 								if ((int)$this->config->get('pm_recruitment_priority') == 1){
 											if (strlen($this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id))){
 												$rolesOut .= '<tr>'.
-																'<td class="class_'.$class_id.' nowrap small">&nbsp;&nbsp;&nbsp;&nbsp;'.$this->game->decorate('roles', array($role_id)).$role_name.'</td>
+																'<td class="class_'.$class_id.' nowrap small">&nbsp;&nbsp;&nbsp;&nbsp;'.$this->game->decorate('roles', array($role_id)).' '.$role_name.'</td>
 																<td><span class="'.$this->handle_cssclass($this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id)).'">'. $this->user->lang('recruit_priority_'.$this->config->get('pm_recruitment_class_'.$class_id.'_'.$role_id)). '</span></td>
 															</tr>';
 												$show =true ;
@@ -349,8 +349,7 @@ class recruitment_portal extends portal_generic {
 				}
 			}
 
-			$recruit .= '<tr><td class="smalltitle" align="center" colspan="2"><b>'.$url.$this->user->lang('recruitment_contact').' </a></b></td></tr>';
-			$recruit .= ' </table>';
+			$recruit .= '</table><div style="margin-top: 4px;">'.$url.$this->user->lang('recruitment_contact').' </a></div>';
 
 		if ($show) {
 			return $recruit;
@@ -361,8 +360,6 @@ class recruitment_portal extends portal_generic {
 	}
 
 	public function reset() {
-		$this->pdc->del('portal.modul.recruitment.'.$this->root_path);
-		$this->pdc->del('portal.modul.recruitment.show');
 	}
 
 	private function handle_cssclass($priority){
@@ -373,5 +370,4 @@ class recruitment_portal extends portal_generic {
 		}
 	}
 }
-if(version_compare(PHP_VERSION, '5.3.0', '<')) registry::add_const('short_recruitment_portal', recruitment_portal::__shortcuts());
 ?>

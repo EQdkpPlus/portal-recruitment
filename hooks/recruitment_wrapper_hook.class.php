@@ -26,7 +26,7 @@ if (!class_exists('recruitment_wrapper_hook')){
 		
 		
 		public function wrapper_hook($arrParams){
-			if ($arrParams['id'] != 'recruitment') return false;
+			if ($arrParams['id'] != 'Recruitment') return false;
 			
 			$out = array(
 				'url'	=> $this->config->get('pm_recruitment_url'),
@@ -35,7 +35,7 @@ if (!class_exists('recruitment_wrapper_hook')){
 				'height'=> '4024',
 			);
 			
-			return array('id'=>'recruitment', 'data'=> $out);
+			return array('id'=>'Recruitment', 'data'=> $out);
 		}
 	}
 }
