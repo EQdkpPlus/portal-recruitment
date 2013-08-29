@@ -34,6 +34,8 @@ $lang['recruit_priority']				= 'Prioritäten anstatt Zahlen nutzen?';
 $lang['pm_recruitment_talentsorroles']	= 'Talente oder Rollen anzeigen?';
 $lang['pm_recruitment_talents']	= 'Talente';
 $lang['pm_recruitment_roles']	= 'Rollen';
+$lang['recruit_layout']	= 'Darstellung';
+$lang['pm_recruitment_layout_2columns'] = 'Zweispaltige Darstellung';
 
 $lang['recruit_priority_high']			= 'Hoch';
 $lang['recruit_priority_middle']		= 'Mittel';

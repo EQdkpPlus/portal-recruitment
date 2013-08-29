@@ -31,6 +31,8 @@ $lang['recruitment_contact_type_help']	= 'If no URL is given, it will link to th
 $lang['recruit_embedded']				= 'How to open given URL';
 $lang['recruit_embedded_help']			= 'If activated, the link opens embedded i an iframe.';
 $lang['recruit_priority']				= 'Use priority instead of numbers';
+$lang['recruit_layout']					= 'Layout';
+$lang['pm_recruitment_layout_2columns'] = 'Use 2 Columns';
 
 $lang['recruit_priority_high']			= 'high';
 $lang['recruit_priority_middle']		= 'medium';
