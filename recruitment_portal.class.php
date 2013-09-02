@@ -275,7 +275,7 @@ class recruitment_portal extends portal_generic {
 	}
 	
 	private function output_classic($arrContent, $blnPriorities){
-		$this->add_css('.rec_middle{color:#ff7c0a;}');
+		$this->tpl->add_css('.rec_middle{color:#ff7c0a;}');
 		$out = '<table width="100%" class="colorswitch hoverrows">';
 		foreach($arrContent as $classid => $val){
 			if ($val['count'] !== 0 || $val['roles_count'] !== 0 || $val['talents_count'] !== 0 || $val['talents_roles_count'] !== 0){
@@ -345,7 +345,7 @@ class recruitment_portal extends portal_generic {
 	}
 	
 	private function output_tooltip($arrContent, $blnPriorities){
-		$this->add_css('.rec_middle{color:#ff7c0a;}
+		$this->tpl->add_css('.rec_middle{color:#ff7c0a;}
 			.rc_class {
 				margin: 4px 4px 4px 4px;
 			}
@@ -433,7 +433,7 @@ class recruitment_portal extends portal_generic {
 	}
 	
 	private function output_mini_icons($arrContent, $blnPriorities){
-		$this->add_css('.rec_middle{color:#ff7c0a;}
+		$this->tpl->add_css('.rec_middle{color:#ff7c0a;}
 			.rc_class_ct {
 				float: left;
 				margin-bottom: 4px;
