@@ -340,7 +340,7 @@ class recruitment_portal extends portal_generic {
 				}
 			}
 		}
-		$out .='<tr><td colspan="2">'.$this->get_recruitment_link().'<i class="icon-chevron-right"></i>'.$this->user->lang('recruitment_contact').'</a></td></tr></table>';
+		$out .='<tr><td colspan="2">'.$this->get_recruitment_link().'<i class="fa fa-chevron-right"></i>'.$this->user->lang('recruitment_contact').'</a></td></tr></table>';
 		return $out;
 	}
 	
