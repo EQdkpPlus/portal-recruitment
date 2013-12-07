@@ -327,7 +327,7 @@ class recruitment_portal extends portal_generic {
 						foreach($rval['roles'] as $roleid => $rrval){
 							if ($rrval['count'] !== 0){
 								$out .= '<tr>';
-								$out .= '	<td class="nowrap">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span title="'.$rval['name'].'">'.$rval['decorate'].'</span> '.$rrval['decorate'].' '.$rrval['name'].'</td><td>';
+								$out .= '	<td class="nowrap">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rval['decorate'].' '.$rrval['decorate'].' '.$rrval['name'].'</td><td>';
 								if($blnPriorities){
 									$out .= '<span class="'.$this->handle_cssclass($rrval['count']).'">'. $this->user->lang('recruit_priority_'.$rrval['count']). '</span>';
 								} else {
@@ -522,7 +522,7 @@ class recruitment_portal extends portal_generic {
 						if (count($tooltip)){
 							$out .= new htooltip('tt_recrui3', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
 						} else {
-							$out .= '<div class="rc_talent rc_gray" title="'.$rval['name'].'">'.$rval['decorate'].'</div>';
+							$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
 						}
 						
 					}
@@ -554,7 +554,7 @@ class recruitment_portal extends portal_generic {
 					if (count($tooltip)){
 						$out .= new htooltip('tt_recrui4', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
 					} else {
-						$out .= '<div class="rc_talent rc_gray" title="'.$rval['name'].'">'.$rval['decorate'].'</div>';
+						$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
 					}
 					
 				}
@@ -566,11 +566,11 @@ class recruitment_portal extends portal_generic {
 				$out .= '	<div class="rc_class rc_gray">'.(($val['decorate_big']) ? $val['decorate_big'] : $val['decorate']).'</div>';
 				if (count($val['talents'])) {
 					foreach($val['talents'] as $talentid => $rval){
-						$out .= '<div class="rc_talent rc_gray" title="'.$rval['name'].'">'.$rval['decorate'].'</div>';
+						$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
 					}
 				} else {
 					foreach($val['roles'] as $talentid => $rval){
-						$out .= '<div class="rc_talent rc_gray" title="'.$rval['name'].'">'.$rval['decorate'].'</div>';
+						$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
 					}
 				}
 				$out .= '</div>';
