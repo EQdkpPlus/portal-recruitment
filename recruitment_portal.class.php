@@ -176,7 +176,7 @@ class recruitment_portal extends portal_generic {
 				'count'			=> 0,
 				'name' 			=> $class_name,
 				'decorate' 		=> $this->game->decorate('classes', array($class_id)),
-				'decorate_big'	=> ($this->game->icon_exists('classes_big')) ? $this->game->decorate('classes', array($class_id, true)): false,
+				'decorate_big'	=> ($this->game->icon_exists('classes_big')) ? '<img src="'.$this->game->decorate('classes', array($class_id, true, null, true)).'" alt="'.$this->game->get_name('classes', $class_id).'" />' : false,
 				'roles'			=> array(),
 				'talents'		=> array(),
 				'roles_count'		=> 0,
