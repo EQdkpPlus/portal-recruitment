@@ -520,7 +520,7 @@ class recruitment_portal extends portal_generic {
 						}
 						
 						if (count($tooltip)){
-							$out .= new htooltip('tt_recrui3', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent" title="'.$rval['name'].'">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
+							$out .= new htooltip('tt_recrui3', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
 						} else {
 							$out .= '<div class="rc_talent rc_gray" title="'.$rval['name'].'">'.$rval['decorate'].'</div>';
 						}
@@ -552,7 +552,7 @@ class recruitment_portal extends portal_generic {
 						}
 					}
 					if (count($tooltip)){
-						$out .= new htooltip('tt_recrui4', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent" title="'.$rval['name'].'">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
+						$out .= new htooltip('tt_recrui4', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
 					} else {
 						$out .= '<div class="rc_talent rc_gray" title="'.$rval['name'].'">'.$rval['decorate'].'</div>';
 					}
