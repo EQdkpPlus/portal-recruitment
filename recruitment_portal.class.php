@@ -76,7 +76,7 @@ class recruitment_portal extends portal_generic {
 						$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
 						if(is_array($arrRoles)){
 							foreach($arrRoles as $role_id => $role_name) {
-								$arrClassDropdown['class'.$class_id.'_talent'.$talent_id.'_role'.$role_id] = $class_name.' - '.$talent_name.' - '.$role_name;									
+								$arrClassDropdown['class'.$class_id.'_talent'.$talent_id.'_role'.$role_id] = $class_name.' - '.$talent_name.' - '.$role_name;
 							} //close foreach
 						}
 					}
@@ -84,73 +84,58 @@ class recruitment_portal extends portal_generic {
 			}
 
 			//Roles
-			$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));			
+			$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
 			if(is_array($arrRoles)){
-				foreach($arrRoles as $role_id => $role_name) {		
-					$arrClassDropdown['class'.$class_id.'_role'.$role_id] = $class_name.' - '.$role_name;		
+				foreach($arrRoles as $role_id => $role_name) {
+					$arrClassDropdown['class'.$class_id.'_role'.$role_id] = $class_name.' - '.$role_name;
 				} //close foreach
 			}
 			
-			$settings[] = array(
-					'name'			=> 'pm_recruitment_class_'.$class_id.'_enabled',
-					'language'		=> $this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id),
-					'property'		=> 'jq_multiselect',
-					'options'		=> $arrClassDropdown,
-					'javascript'	=> 'onchange="load_settings()"',
+			$settings['class_'.$class_id.'_enabled'] = array(
+				'dir_lang'		=> $this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id),
+				'type'			=> 'multiselect',
+				'options'		=> $arrClassDropdown,
+				'class'			=> 'js_reload',
 			);
 			
-			$arrSelected = unserialize($this->config->get('pm_recruitment_class_'.$class_id.'_enabled'));
+			$arrSelected = unserialize($this->config('class_'.$class_id.'_enabled'));
 			foreach($arrSelected as $strKey){
-				$settings[] = array(
-						'name'			=> 'pm_recruitment_setting_'.$strKey,
-						'language'		=> $arrClassDropdown[$strKey],
-						'property'		=> ((int)$this->config->get('pm_recruitment_priority') == 1) ? 'dropdown' : 'text',
-						'options'		=> $priority_dropdown,
+				$settings[$strKey] = array(
+					'dir_lang'		=> $arrClassDropdown[$strKey],
+					'type'			=> ((int)$this->config('priority') == 1) ? 'dropdown' : 'text',
+					'options'		=> $priority_dropdown,
 				);
 			}
 			
 		}
 		
 		$a_linkMode= array(
-				'0'				=> $this->user->lang('pk_set_link_type_self'),
-				'1'				=> $this->user->lang('pk_set_link_type_link'),
-				'2'				=> $this->user->lang('pk_set_link_type_iframe'),
-				'4'				=> $this->user->lang('pk_set_link_type_D_iframe_womenues'),
+			'0'				=> $this->user->lang('pk_set_link_type_self'),
+			'1'				=> $this->user->lang('pk_set_link_type_link'),
+			'2'				=> $this->user->lang('pk_set_link_type_iframe'),
+			'4'				=> $this->user->lang('pk_set_link_type_D_iframe_womenues'),
 		);
-		
-		$settings[]	= array(
-				'name'		=> 'pm_recruitment_priority',
-				'language'	=> 'recruit_priority',
-				'property'	=> 'checkbox',
-				'javascript'=> 'onchange="load_settings()"',
+		$settings['priority']	= array(
+			'type'			=> 'checkbox',
+			'class'			=> 'js_reload'
 		);
-		$settings[]	= array(
-				'name'		=> 'pm_recruitment_url',
-				'language'	=> 'recruitment_contact_type',
-				'property'	=> 'text',
-				'help'		=> 'recruitment_contact_type_help',
-				'size'		=> 60,
+		$settings['url']	= array(
+			'type'			=> 'text',
+			'size'			=> 60,
 		);
-		$settings[]	= array(
-				'name'		=> 'pm_recruitment_embed',
-				'language'	=> 'recruit_embedded',
-				'property'	=> 'dropdown',
-				'help'		=> 'recruit_embedded_help',
-				'options'	=> $a_linkMode,
+		$settings['embed']	= array(
+			'type'			=> 'dropdown',
+			'options'		=> $a_linkMode,
 		);
-		$settings[]	= array(
-				'name'		=> 'pm_recruitment_layout',
-				'language'	=> 'recruit_layout',
-				'property'	=> 'dropdown',
-				'options' => array('Classic', 'Tooltip', 'Mini-Icons'),
-				'javascript'=> 'onchange="load_settings()"',
+		$settings['layout']	= array(
+			'type'			=> 'dropdown',
+			'options'		=> array('Classic', 'Tooltip', 'Mini-Icons'),
+			'class'			=> 'js_reload'
 		);
 
-		if ((int)$this->config->get('pm_recruitment_layout') == 2){
-			$settings[]	= array(
-					'name'		=> 'pm_recruitment_layout_2columns',
-					'language'	=> 'pm_recruitment_layout_2columns',
-					'property'	=> 'checkbox',
+		if ((int)$this->config('layout') == 2){
+			$settings['2columns']	= array(
+				'type'		=> 'radio',
 			);
 		}
 		return $settings;
@@ -168,13 +153,13 @@ class recruitment_portal extends portal_generic {
 			if($class_id == 0) continue;
 
 			$arrLang[$class_id] = array(
-				'key'			=> 'class'.$class_id,
-				'count'			=> 0,
-				'name' 			=> $class_name,
-				'decorate' 		=> $this->game->decorate('classes', array($class_id)),
-				'decorate_big'	=> ($this->game->icon_exists('classes_big')) ? '<img src="'.$this->game->decorate('classes', array($class_id, true, null, true)).'" alt="'.$this->game->get_name('classes', $class_id).'" />' : false,
-				'roles'			=> array(),
-				'talents'		=> array(),
+				'key'				=> 'class'.$class_id,
+				'count'				=> 0,
+				'name' 				=> $class_name,
+				'decorate' 			=> $this->game->decorate('classes', array($class_id)),
+				'decorate_big'		=> ($this->game->icon_exists('classes_big')) ? '<img src="'.$this->game->decorate('classes', array($class_id, true, null, true)).'" alt="'.$this->game->get_name('classes', $class_id).'" />' : false,
+				'roles'				=> array(),
+				'talents'			=> array(),
 				'roles_count'		=> 0,
 				'talents_count' 	=> 0,
 				'talents_roles_count' => 0,
@@ -226,9 +211,9 @@ class recruitment_portal extends portal_generic {
 		
 		foreach($classes as $class_id => $class_name) {
 			if($class_id == 0) continue;
-			$arrSelected = unserialize($this->config->get('pm_recruitment_class_'.$class_id.'_enabled'));
+			$arrSelected = unserialize($this->config('class_'.$class_id.'_enabled'));
 			foreach($arrSelected as $strKey){
-				$conf = $this->config->get('pm_recruitment_setting_'.$strKey);
+				$conf = $this->config('pm_recruitment_setting_'.$strKey);
 				//Split Key
 				$arrSplitted = explode("_", $strKey);
 				
@@ -262,11 +247,11 @@ class recruitment_portal extends portal_generic {
 		}
 				
 		$arrStyles = array(0 => 'classic', 1 => 'tooltip', 2 => 'mini_icons');
-		$intStyle = (int)$this->config->get('pm_recruitment_layout');
+		$intStyle = (int)$this->config('layout');
 		
 		$strMethod = "output_".$arrStyles[$intStyle];
 		
-		$strContent = $this->$strMethod($arrLang, (int)$this->config->get('pm_recruitment_priority'));
+		$strContent = $this->$strMethod($arrLang, (int)$this->config('priority'));
 		
 		return $strContent;
 	}
@@ -470,7 +455,7 @@ class recruitment_portal extends portal_generic {
 			default: $ttpos = 'top bottom';
 		}
 		
-		$out = '<div'.(($this->config->get('pm_recruitment_layout_2columns') == 1) ? ' style="width: 255px;"' : '').'>';
+		$out = '<div'.(($this->config('2columns') == 1) ? ' style="width: 255px;"' : '').'>';
 		foreach($arrContent as $classid => $val){
 			$tooltip = array();
 			if ($val['count'] !== 0 || $val['roles_count'] !== 0 || $val['talents_count'] !== 0 || $val['talents_roles_count'] !== 0){
@@ -587,12 +572,12 @@ class recruitment_portal extends portal_generic {
 	private function get_recruitment_link(){
 		//show Link URL
 		$target = '';
-		if (strlen($this->config->get('pm_recruitment_url')) > 1) {
-			switch ($this->config->get('pm_recruitment_embed')){
-				case '0':  $path = $this->config->get('pm_recruitment_url');
+		if (strlen($this->config('url')) > 1) {
+			switch ($this->config('embed')){
+				case '0':  $path = $this->config('url');
 				break ;
 				case '1':  $target = ' target="_blank"';
-				$path = $this->config->get('pm_recruitment_url');
+				$path = $this->config('url');
 				break ;
 				case '2':
 				case '3':
