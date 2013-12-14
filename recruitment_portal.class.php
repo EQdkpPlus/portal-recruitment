@@ -22,22 +22,23 @@ if ( !defined('EQDKP_INC') ){
 
 class recruitment_portal extends portal_generic {
 	public static function __shortcuts() {
-		$shortcuts = array('user', 'pdc', 'core', 'html', 'game', 'tpl', 'pm', 'config', 'crypt' => 'encrypt', 'pdh', 'routing', 'jquery');
+		$shortcuts = array('crypt' => 'encrypt');
 		return array_merge(parent::$shortcuts, $shortcuts);
 	}
 
-	protected $path		= 'recruitment';
-	protected $data		= array(
+	protected static $path		= 'recruitment';
+	protected static $data		= array(
 		'name'			=> 'Recruitment Module',
 		'version'		=> '1.1.1',
-		'author'		=> 'Corgan',
+		'author'		=> 'GodMod',
 		'icon'			=> 'fa-search-plus',
 		'contact'		=> EQDKP_PROJECT_URL,
 		'description'	=> 'Searching for Members',
+		'lang_prefix'	=> 'recruitment_',
 	);
-	protected $positions = array('middle', 'left1', 'left2', 'right', 'bottom');
+	protected static $positions = array('middle', 'left1', 'left2', 'right', 'bottom');
 
-	protected $install	= array(
+	protected static $install	= array(
 		'autoenable'		=> '0',
 		'defaultposition'	=> 'left1',
 		'defaultnumber'		=> '1',
@@ -45,12 +46,7 @@ class recruitment_portal extends portal_generic {
 	
 	protected $hooks = array(
 		array('wrapper', 'recruitment_wrapper_hook')
-	);
-
-	public function __construct($position=''){
-		parent::__construct($position);	
-	}
-	
+	);	
 
 	
 	public function get_settings($state){	
@@ -614,7 +610,7 @@ class recruitment_portal extends portal_generic {
 		return $url;
 	}
 
-	public function reset() {
+	public static function reset() {
 	}
 }
 ?>
