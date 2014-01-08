@@ -24,9 +24,12 @@ if (!class_exists('recruitment_wrapper_hook')){
 	class recruitment_wrapper_hook extends gen_class{
 		public static $shortcuts = array('user', 'config');
 		
+		public function __construct($moduleID){
+			
+		}
 		
 		public function wrapper_hook($arrParams){
-			if ($arrParams['id'] != 'Recruitment') return false;
+			if ($arrParams['id'] != 'recruitment') return false;
 			
 			$out = array(
 				'url'	=> $this->config->get('pm_recruitment_url'),
