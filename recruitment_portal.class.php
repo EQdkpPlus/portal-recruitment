@@ -98,7 +98,7 @@ class recruitment_portal extends portal_generic {
 				'class'			=> 'js_reload',
 			);
 			
-			$arrSelected = unserialize($this->config('class_'.$class_id.'_enabled'));
+			$arrSelected = $this->config('class_'.$class_id.'_enabled');
 			foreach($arrSelected as $strKey){
 				$settings[$strKey] = array(
 					'dir_lang'		=> $arrClassDropdown[$strKey],
@@ -116,7 +116,7 @@ class recruitment_portal extends portal_generic {
 			'4'				=> $this->user->lang('pk_set_link_type_D_iframe_womenues'),
 		);
 		$settings['priority']	= array(
-			'type'			=> 'checkbox',
+			'type'			=> 'radio',
 			'class'			=> 'js_reload'
 		);
 		$settings['url']	= array(
@@ -211,9 +211,9 @@ class recruitment_portal extends portal_generic {
 		
 		foreach($classes as $class_id => $class_name) {
 			if($class_id == 0) continue;
-			$arrSelected = unserialize($this->config('class_'.$class_id.'_enabled'));
+			$arrSelected = $this->config('class_'.$class_id.'_enabled');
 			foreach($arrSelected as $strKey){
-				$conf = $this->config('pm_recruitment_setting_'.$strKey);
+				$conf = $this->config($strKey);
 				//Split Key
 				$arrSplitted = explode("_", $strKey);
 				
