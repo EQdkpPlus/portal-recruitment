@@ -57,56 +57,44 @@ class recruitment_portal extends portal_generic {
 			'low'	=> $this->user->lang('recruit_priority_low'),
 		);
 		// Load the classes
-		$classes = $this->game->get('classes');
-		foreach($classes as $class_id => $class_name) {
-			if($class_id == 0) continue;
-			
-			$arrClassDropdown = array(
-				'class'.$class_id => $class_name
-			);
-
-			//Talents
-			if($this->game->icon_exists('talents')){
-				$talents = $this->game->glang('talents');
-				if(is_array($talents[$class_id])){
-					foreach($talents[$class_id] as $talent_id => $talent_name) {
-						$arrClassDropdown['class'.$class_id.'_talent'.$talent_id] = $class_name.' - '.$talent_name;
-							
-						//Roles
-						$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
-						if(is_array($arrRoles)){
-							foreach($arrRoles as $role_id => $role_name) {
-								$arrClassDropdown['class'.$class_id.'_talent'.$talent_id.'_role'.$role_id] = $class_name.' - '.$talent_name.' - '.$role_name;
-							} //close foreach
-						}
+		$arrClasses = $this->game->get_recruitment_classes();
+		$arrToDisplay = $arrClasses['todisplay'];
+		
+		$strPrimaryClass = $this->game->get_primary_class();
+		
+		$intStopLevel = 0;
+		foreach($arrToDisplay as $key => $val){
+			if ($val === $strPrimaryClass) $intStopLevel = $key;
+		}
+		
+		$arrSettings = $this->build_settings($arrClasses['data'],  $arrToDisplay, $intStopLevel);
+		
+		foreach ($arrSettings as $key => $val){		
+			if (!isset($val['options'])){
+				$settings[$key] = array(
+					'dir_lang'		=> $val['field']['icon'].' '.$val['field']['text'],
+					'type'			=> 'plaintext',
+				);			
+			} else {
+				$settings[$key] = array(
+						'dir_lang'		=> $val['field']['icon'].' '.$val['field']['text'],
+						'type'			=> 'multiselect',
+						'options'		=> $val['options'],
+						'class'			=> 'js_reload',
+				);
+				
+				$arrSelected = $this->config($key);
+				if (is_array($arrSelected)){
+					foreach($arrSelected as $strKey){
+						$settings[$strKey] = array(
+								'dir_lang'		=> '   '.$val['field']['icon'].' '.$val['field']['text'].' - '.$val['options'][$strKey],
+								'type'			=> ((int)$this->config('priority') == 1) ? 'dropdown' : 'text',
+								'options'		=> $priority_dropdown,
+						);
 					}
 				}
-			}
-
-			//Roles
-			$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
-			if(is_array($arrRoles)){
-				foreach($arrRoles as $role_id => $role_name) {
-					$arrClassDropdown['class'.$class_id.'_role'.$role_id] = $class_name.' - '.$role_name;
-				} //close foreach
-			}
-			
-			$settings['class_'.$class_id.'_enabled'] = array(
-				'dir_lang'		=> $this->game->decorate('classes', array($class_id)).' '.$this->game->get_name('classes', $class_id),
-				'type'			=> 'multiselect',
-				'options'		=> $arrClassDropdown,
-				'class'			=> 'js_reload',
-			);
-			
-			$arrSelected = $this->config('class_'.$class_id.'_enabled');
-			foreach($arrSelected as $strKey){
-				$settings[$strKey] = array(
-					'dir_lang'		=> $arrClassDropdown[$strKey],
-					'type'			=> ((int)$this->config('priority') == 1) ? 'dropdown' : 'text',
-					'options'		=> $priority_dropdown,
-				);
-			}
-			
+				
+			}	
 		}
 		
 		$a_linkMode= array(
@@ -140,8 +128,176 @@ class recruitment_portal extends portal_generic {
 		}
 		return $settings;
 	}
+	
+	private function build_settings($arrData, $arrToDisplay, $stop_level, $level = 0, $string = ""){
+		$arrOut = array();
+		
+		foreach ($arrData as $key => $val) {
+			if (is_array($val) && ($level < $stop_level)){
+				
+				$arrOut[$string.$key.'_']['field'] = array(
+					'type'	=> 'plaintext',	
+					'text'	=> $this->game->get_name($arrToDisplay[$level], $key),
+					'icon'	=> $this->game->decorate($arrToDisplay[$level], $key),
+					'level'	=> $level,
+				);
+	
+				$arrResult = $this->build_settings($val, $arrToDisplay, $stop_level, $level+1, $string.$key.'_');
+				$arrOut = array_merge($arrOut, $arrResult);
+	
+			} elseif($level == $stop_level) {
+				$arrOut[$string.$key.'_']['field'] = array(
+					'type'	=> 'multiselect',
+					'text'	=>  $this->game->get_name($arrToDisplay[$level], ((!is_array($val)) ? $val : $key)),
+					'icon'	=>  $this->game->decorate($arrToDisplay[$level], ((!is_array($val)) ? $val : $key)),
+					'level'	=> $level,
+				);
+				
+				$arrOut[$string.$key.'_']['options'] = $this->build_dropdown($val, $arrToDisplay, $level+1, $string.$key.'_', $key);
+				
+				//Add Roles
+				$arrRoles = $this->pdh->get('roles', 'memberroles', array($key));
+				if(is_array($arrRoles)){
+					foreach($arrRoles as $role_id => $role_name) {
+						$arrOut[$string.$key.'_']['options'][$string.$key.'_role'.$role_id] = $role_name;
+					} //close foreach
+				}
+				//End Roles
+			}	
+		}
+		
+		return $arrOut;
+	}
+	
+	
+	private function build_dropdown($arrData, $arrToDisplay, $level = 0, $string = "", $mykey = false){
+		if ($mykey) $arrOut[$string.'_val'] = $this->game->get_name('primary', $mykey);
+		foreach ($arrData as $key => $val) {
+			if (is_array($val)){
+	
+				$arrOut[$string.$key.'_'] = $this->game->get_name($arrToDisplay[$level], $key);
+	
+				$arrResult = $this->build_dropdown($val, $arrToDisplay, $level+1, $string.$key.'_', false);
+				$arrOut = array_merge($arrOut, $arrResult);
+	
+			} else {
+				$arrOut[$string.$key.'_'] =  $this->game->get_name($arrToDisplay[$level], $val);
+			}
+		}
+	
+		return $arrOut;
+	}
+	
+	
+	private function build_count_array($arrData, $arrToDisplay, $stop_level, $level = 0, $string = ""){
+		$arrOut = array();
+	
+		foreach ($arrData as $key => $val) {
+			if (is_array($val) && ($level < $stop_level)){
+	
+				$arrOut[$string.$key.'_'] = array(
+						'key'	=> $string.$key.'_',
+						'type'	=> 'text',
+						'name'	=> $this->game->get_name($arrToDisplay[$level], $key),
+						'icon'	=> $this->game->decorate($arrToDisplay[$level], $key),
+						'level'	=> $level,
+				);
+	
+				$arrResult = $this->build_count_array($val, $arrToDisplay, $stop_level, $level+1, $string.$key.'_');
+				$arrOut = array_merge($arrOut, $arrResult);
+	
+			} elseif($level == $stop_level) {
+				$arrOut[$string.$key.'_'] = array(
+						'key'	=> $string.$key.'_',
+						'type'	=> 'primary',
+						'name'	=>  $this->game->get_name($arrToDisplay[$level], ((!is_array($val)) ? $val : $key)),
+						'icon'	=>  $this->game->decorate($arrToDisplay[$level], ((!is_array($val)) ? $val : $key)),
+						'level'	=> $level,
+						'count'	=> ($this->config($string.$key.'__val')) ? $this->config($string.$key.'__val') : 0,
+						'childs_count' => 0,
+						'childs' => array(),
+						'roles' => array(),
+						'roles_count' => 0,
+				);
+
+				//Add Roles
+				$arrRoles = $this->pdh->get('roles', 'memberroles', array($key));
+				$intRoleCount = 0;
+				if(is_array($arrRoles)){
+					foreach($arrRoles as $role_id => $role_name) {
+						$arrOut[$string.$key.'_']['roles'] [$string.$key.'_role'.$role_id] = array(
+							'key'		=> $string.$key.'_role'.$role_id,
+							'name'		=> $role_name,
+							'decorate'	=> $this->game->decorate('roles', array($role_id)),
+							'count'		=> ($this->config($string.$key.'_role'.$role_id)) ? $this->config($string.$key.'_role'.$role_id) : 0,
+						);
+						
+						$intRoleCount += $arrOut[$string.$key.'_']['roles'] [$string.$key.'_role'.$role_id]['count'];
+					} //close foreach
+				}
+				$arrOut[$string.$key.'_']['roles_count'] = $intRoleCount;
+				//End Roles
+				
+				//Add childs
+				$arrChilds = $this->build_childs($val, $arrToDisplay, $level+1, $string.$key.'_');
+				$arrOut[$string.$key.'_']['childs_count'] = $arrChilds['count'];
+				$arrOut[$string.$key.'_']['childs']		  = $arrChilds['childs'];
+			}
+		}
+	
+		return $arrOut;
+	}
+	
+	private function  build_childs($arrData, $arrToDisplay, $level = 0, $string = ""){
+		$arrOut = array('childs' => array(), 'count' => 0);
+		
+		foreach ($arrData as $key => $val) {
+			if (is_array($val)){
+					
+				$arrOut['childs'][$string.$key.'_'] = array(
+						'key'		=> $string.$key.'_',
+						'name'		=> $this->game->get_name($arrToDisplay[$level], $key),
+						'decorate'	=> $this->game->decorate($arrToDisplay[$level], array($key)),
+						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
+				);
+				
+				$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];		
+				$arrResult = $this->build_dropdown($val, $arrToDisplay, $level+1, $string.$key.'_', false);
+				$arrOut['childs'] = array_merge($arrOut['childs'], $arrResult['childs']);
+				$arrOut['count'] += $arrResult['count'];
+		
+			} else {
+				$arrOut['childs'][$string.$key.'_'] = array(
+						'key'		=> $string.$key.'_',
+						'name'		=> $this->game->get_name($arrToDisplay[$level], $val),
+						'decorate'	=> $this->game->decorate($arrToDisplay[$level], array($val)),
+						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
+				);
+				$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];
+			}
+		}
+		
+		return $arrOut;	
+	}
 
 	public function output() {
+		$arrClasses = $this->game->get_recruitment_classes();
+		d($arrClasses);
+		$arrToDisplay = $arrClasses['todisplay'];
+		
+		$strPrimaryClass = $this->game->get_primary_class();
+		
+		$intStopLevel = 0;
+		foreach($arrToDisplay as $key => $val){
+			if ($val === $strPrimaryClass) $intStopLevel = $key;
+		}
+		
+		$arrSettings = $this->build_count_array($arrClasses['data'],  $arrToDisplay, $intStopLevel);
+		d($arrSettings);
+		
+		$settings = array();
+
+		
 		// Load the classes
 		$classes = $this->game->get('classes');
 		$conf = array();
@@ -166,6 +322,7 @@ class recruitment_portal extends portal_generic {
 			);
 		
 			//Talents
+
 			if($this->game->icon_exists('talents')){
 				$talents = $this->game->glang('talents');
 				if(is_array($talents[$class_id])){
