@@ -117,15 +117,10 @@ class recruitment_portal extends portal_generic {
 		);
 		$settings['layout']	= array(
 			'type'			=> 'dropdown',
-			'options'		=> array('Classic', 'Tooltip', 'Mini-Icons'),
+			'options'		=> array('Classic', 'Tooltip'),
 			'class'			=> 'js_reload'
 		);
 
-		if ((int)$this->config('layout') == 2){
-			$settings['2columns']	= array(
-				'type'		=> 'radio',
-			);
-		}
 		return $settings;
 	}
 	
@@ -139,6 +134,7 @@ class recruitment_portal extends portal_generic {
 					'type'	=> 'plaintext',	
 					'text'	=> $this->game->get_name($arrToDisplay[$level], $key),
 					'icon'	=> $this->game->decorate($arrToDisplay[$level], $key),
+					'icon_big' => $this->game->decorate($arrToDisplay[$level], $key, array(), 48),
 					'level'	=> $level,
 				);
 	
@@ -150,6 +146,7 @@ class recruitment_portal extends portal_generic {
 					'type'	=> 'multiselect',
 					'text'	=>  $this->game->get_name($arrToDisplay[$level], ((!is_array($val)) ? $val : $key)),
 					'icon'	=>  $this->game->decorate($arrToDisplay[$level], ((!is_array($val)) ? $val : $key)),
+					'icon_big' => $this->game->decorate($arrToDisplay[$level], ((!is_array($val)) ? $val : $key), array(), 48),
 					'level'	=> $level,
 				);
 				
@@ -207,6 +204,8 @@ class recruitment_portal extends portal_generic {
 				$arrOut = array_merge($arrOut, $arrResult);
 	
 			} elseif($level == $stop_level) {
+				if ($key == 0) continue;
+				
 				$arrOut[$string.$key.'_'] = array(
 						'key'	=> $string.$key.'_',
 						'type'	=> 'primary',
@@ -227,8 +226,9 @@ class recruitment_portal extends portal_generic {
 					foreach($arrRoles as $role_id => $role_name) {
 						$arrOut[$string.$key.'_']['roles'] [$string.$key.'_role'.$role_id] = array(
 							'key'		=> $string.$key.'_role'.$role_id,
+							'type'		=> 'role',
 							'name'		=> $role_name,
-							'decorate'	=> $this->game->decorate('roles', array($role_id)),
+							'icon'		=> $this->game->decorate('roles', $role_id),
 							'count'		=> ($this->config($string.$key.'_role'.$role_id)) ? $this->config($string.$key.'_role'.$role_id) : 0,
 						);
 						
@@ -248,31 +248,41 @@ class recruitment_portal extends portal_generic {
 		return $arrOut;
 	}
 	
-	private function  build_childs($arrData, $arrToDisplay, $level = 0, $string = ""){
+	private function  build_childs($arrData, $arrToDisplay, $level = 0, $string = "", $orig_string = false){
 		$arrOut = array('childs' => array(), 'count' => 0);
+		
+		$string = ($orig_string) ? $orig_string : $string;
+		
+		$arrSelected = $this->config($string);
+		
+		if (!is_array($arrData)) return $arrOut;
 		
 		foreach ($arrData as $key => $val) {
 			if (is_array($val)){
 					
 				$arrOut['childs'][$string.$key.'_'] = array(
 						'key'		=> $string.$key.'_',
+						'type'		=> 'child',
 						'name'		=> $this->game->get_name($arrToDisplay[$level], $key),
-						'decorate'	=> $this->game->decorate($arrToDisplay[$level], array($key)),
+						'icon'		=> $this->game->decorate($arrToDisplay[$level], $key),
 						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
 				);
+				if (!in_array($string.$key.'_', $arrSelected)) $arrOut['childs'][$string.$key.'_']['count'] = 0;
 				
 				$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];		
-				$arrResult = $this->build_dropdown($val, $arrToDisplay, $level+1, $string.$key.'_', false);
+				$arrResult = $this->build_child($val, $arrToDisplay, $level+1, $string.$key.'_', $orig_string);
 				$arrOut['childs'] = array_merge($arrOut['childs'], $arrResult['childs']);
 				$arrOut['count'] += $arrResult['count'];
 		
 			} else {
 				$arrOut['childs'][$string.$key.'_'] = array(
 						'key'		=> $string.$key.'_',
+						'type'		=> 'child',
 						'name'		=> $this->game->get_name($arrToDisplay[$level], $val),
-						'decorate'	=> $this->game->decorate($arrToDisplay[$level], array($val)),
+						'icon'		=> $this->game->decorate($arrToDisplay[$level], $val),
 						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
 				);
+				if (!in_array($string.$key.'_', $arrSelected)) $arrOut['childs'][$string.$key.'_']['count'] = 0;
 				$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];
 			}
 		}
@@ -282,7 +292,6 @@ class recruitment_portal extends portal_generic {
 
 	public function output() {
 		$arrClasses = $this->game->get_recruitment_classes();
-		d($arrClasses);
 		$arrToDisplay = $arrClasses['todisplay'];
 		
 		$strPrimaryClass = $this->game->get_primary_class();
@@ -293,122 +302,15 @@ class recruitment_portal extends portal_generic {
 		}
 		
 		$arrSettings = $this->build_count_array($arrClasses['data'],  $arrToDisplay, $intStopLevel);
-		d($arrSettings);
-		
-		$settings = array();
-
-		
-		// Load the classes
-		$classes = $this->game->get('classes');
-		$conf = array();
-		
-		//Build Language Array
-		// Load the classes
-		$classes = $this->game->get('classes');
-		foreach($classes as $class_id => $class_name) {
-			if($class_id == 0) continue;
-
-			$arrLang[$class_id] = array(
-				'key'				=> 'class'.$class_id,
-				'count'				=> 0,
-				'name' 				=> $class_name,
-				'decorate' 			=> $this->game->decorate('classes', array($class_id)),
-				'decorate_big'		=> ($this->game->icon_exists('classes_big')) ? '<img src="'.$this->game->decorate('classes', array($class_id, true, null, true)).'" alt="'.$this->game->get_name('classes', $class_id).'" />' : false,
-				'roles'				=> array(),
-				'talents'			=> array(),
-				'roles_count'		=> 0,
-				'talents_count' 	=> 0,
-				'talents_roles_count' => 0,
-			);
-		
-			//Talents
-
-			if($this->game->icon_exists('talents')){
-				$talents = $this->game->glang('talents');
-				if(is_array($talents[$class_id])){
-					foreach($talents[$class_id] as $talent_id => $talent_name) {
-						$arrLang[$class_id]['talents'][$talent_id] = array(
-							'key'		=> 'class'.$class_id.'_talent'.$talent_id,
-							'name'		=> $talent_name,
-							'count'		=> 0,
-							'decorate'	=> $this->game->decorate('talents', array($class_id, $talent_id)),
-							'roles'		=> array(),
-							'roles_count' => 0,
-						);
-						
-						//Roles
-						$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
-						if(is_array($arrRoles)){
-							foreach($arrRoles as $role_id => $role_name) {
-								$arrLang[$class_id]['talents'][$talent_id]['roles'][$role_id] = array(
-									'key'		=> 'class'.$class_id.'_talent'.$talent_id.'_role'.$role_id,
-									'name'		=> $role_name,
-									'decorate'	=> $this->game->decorate('roles', array($role_id)),
-									'count'		=> 0,
-								);
-							}
-						}
-					}
-				}
-			}
-		
-			//Roles
-			$arrRoles = $this->pdh->get('roles', 'memberroles', array($class_id));
-			if(is_array($arrRoles)){
-				foreach($arrRoles as $role_id => $role_name) {
-					$arrLang[$class_id]['roles'][$role_id] = array(
-							'key'		=> 'class'.$class_id.'_role'.$role_id,
-							'name'		=> $role_name,
-							'decorate'	=> $this->game->decorate('roles', array($role_id)),
-							'count'		=> 0,
-					);
-				} //close foreach
-			}
-		}
-		
-		foreach($classes as $class_id => $class_name) {
-			if($class_id == 0) continue;
-			$arrSelected = $this->config('class_'.$class_id.'_enabled');
-			foreach($arrSelected as $strKey){
-				$conf = $this->config($strKey);
-				//Split Key
-				$arrSplitted = explode("_", $strKey);
 				
-				//Class
-				$class_id = (int)substr($arrSplitted[0], 5);
-
-				if (isset($arrSplitted[1]) && strpos($arrSplitted[1], "role") === 0){
-					//Role
-					$role_id = (int)substr($arrSplitted[1], 4);
-					$arrLang[$class_id]['roles'][$role_id]['count'] = $conf;
-					$arrLang[$class_id]['roles_count'] = $arrLang[$class_id]['roles_count']+1;
-				} elseif(isset($arrSplitted[1]) && strpos($arrSplitted[1], "talent") === 0){
-					//Talent
-					$talent_id = (int)substr($arrSplitted[1], 6);
-					
-					//Talent-Role
-					if (isset($arrSplitted[2])){
-						$role_id = (int)substr($arrSplitted[2], 4);
-						$arrLang[$class_id]['talents'][$talent_id]['roles'][$role_id]['count'] = $conf;
-						$arrLang[$class_id]['talents_roles_count'] = $arrLang[$class_id]['talents_roles_count']+1;
-						$arrLang[$class_id]['talents'][$talent_id]['roles_count'] = $arrLang[$class_id]['talents'][$talent_id]['roles_count']+1;
-					} else {
-						$arrLang[$class_id]['talents'][$talent_id]['count'] = $conf;
-						$arrLang[$class_id]['talents_count'] = $arrLang[$class_id]['talents_count']+1;
-					}
-				} else {
-					$arrLang[$class_id]['count'] = $conf;
-				}
-
-			}		
-		}
-				
-		$arrStyles = array(0 => 'classic', 1 => 'tooltip', 2 => 'mini_icons');
+		$arrStyles = array(0 => 'classic', 1 => 'tooltip');
 		$intStyle = (int)$this->config('layout');
 		
 		$strMethod = "output_".$arrStyles[$intStyle];
 		
-		$strContent = $this->$strMethod($arrLang, (int)$this->config('priority'));
+		if (method_exists($this, $strMethod)){
+			$strContent = $this->$strMethod($arrSettings, (int)$this->config('priority'));
+		}
 		
 		return $strContent;
 	}
@@ -416,11 +318,16 @@ class recruitment_portal extends portal_generic {
 	private function output_classic($arrContent, $blnPriorities){
 		$this->tpl->add_css('.rec_middle{color:#ff7c0a;}');
 		$out = '<table width="100%" class="colorswitch hoverrows">';
-		foreach($arrContent as $classid => $val){
-			if ($val['count'] !== 0 || $val['roles_count'] !== 0 || $val['talents_count'] !== 0 || $val['talents_roles_count'] !== 0){
+		foreach($arrContent as $key => $val){
+			if ($val['type'] == 'text'){
+				$out.= '<tr><th colspan="2">'.$val['name'].'</th></tr>';
+				continue;
+			}
+			
+			if ($val['count'] !== 0 || $val['childs_count'] !== 0 || $val['roles_count'] !== 0){
 				$out .= '<tr>';
-				$out .= '	<td>'.$val['decorate'].' '.$val['name'].'</td><td>';
-						
+				$out .= '	<td>'.$val['icon'].' '.$val['name'].'</td><td>';
+				
 				if($blnPriorities && $val['count'] !== 0){
 					$out .= '<span class="'.$this->handle_cssclass($val['count']).'">'. $this->user->lang('recruit_priority_'.$val['count']). '</span>';
 				} elseif($val['count'] !== 0) {
@@ -428,12 +335,30 @@ class recruitment_portal extends portal_generic {
 				}
 				$out .= '	</td>';
 				$out .= '</tr>';
+				
 				//Roles
 				if ($val['roles_count'] !== 0){
 					foreach($val['roles'] as $roleid => $rval){
 						if ($rval['count'] !== 0){
 							$out .= '<tr>';
-							$out .= '	<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rval['decorate'].' '.$rval['name'].'</td><td>';
+							$out .= '	<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rval['icon'].' '.$rval['name'].'</td><td>';
+							if($blnPriorities){
+								$out .= '<span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
+							} else {
+								$out .= $rval['count'];
+							}
+							$out .= '	</td>';
+							$out .= '</tr>';
+						}			
+					}
+				}
+				
+				//Childs
+				if ($val['childs_count'] !== 0){
+					foreach($val['childs'] as $childid => $rval){
+						if ($rval['count'] !== 0){
+							$out .= '<tr>';
+							$out .= '	<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rval['icon'].' '.$rval['name'].'</td><td>';
 							if($blnPriorities){
 								$out .= '<span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
 							} else {
@@ -444,39 +369,9 @@ class recruitment_portal extends portal_generic {
 						}
 						
 					}
-				}
-				
-				//Talents
-				foreach($val['talents'] as $talentid => $rval){
-					if ($rval['count'] !== 0){
-						$out .= '<tr>';
-						$out .= '	<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rval['decorate'].' '.$rval['name'].'</td><td>';
-						if($blnPriorities){
-							$out .= '<span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
-						} else {
-							$out .= $rval['count'];
-						}
-						$out .= '	</td>';
-						$out .= '</tr>';
-					}
 					
-					//Talent-Roles
-					if ($rval['roles_count'] !== 0){
-						foreach($rval['roles'] as $roleid => $rrval){
-							if ($rrval['count'] !== 0){
-								$out .= '<tr>';
-								$out .= '	<td class="nowrap">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$rval['decorate'].' '.$rrval['decorate'].' '.$rrval['name'].'</td><td>';
-								if($blnPriorities){
-									$out .= '<span class="'.$this->handle_cssclass($rrval['count']).'">'. $this->user->lang('recruit_priority_'.$rrval['count']). '</span>';
-								} else {
-									$out .= $rrval['count'];
-								}
-								$out .= '	</td>';
-								$out .= '</tr>';
-							}
-						}
-					}				
 				}
+			
 			}
 		}
 		$out .='<tr><td colspan="2">'.$this->get_recruitment_link().'<i class="fa fa-chevron-right"></i>'.$this->user->lang('recruitment_contact').'</a></td></tr></table>';
@@ -512,13 +407,17 @@ class recruitment_portal extends portal_generic {
 		
 		$out = '<div>';
 		foreach($arrContent as $classid => $val){
-			$tooltip = array();
-			if ($val['count'] !== 0 || $val['roles_count'] !== 0 || $val['talents_count'] !== 0 || $val['talents_roles_count'] !== 0){
-		
+			if ($val['type'] == 'text'){
+				$out.= '<div><h3>'.$val['name'].'</h3></div>';
+				continue;
+			}
+			
+			$tooltip = array();	
+			if ($val['count'] !== 0 || $val['childs_count'] !== 0 || $val['roles_count'] !== 0){
 				if($blnPriorities && $val['count'] !== 0){
-					$tooltip[] = $val['decorate'].' '.$val['name'].': <span class="'.$this->handle_cssclass($val['count']).'">'. $this->user->lang('recruit_priority_'.$val['count']). '</span>';
+					$tooltip[] = $val['icon'].' '.$val['name'].': <span class="'.$this->handle_cssclass($val['count']).'">'. $this->user->lang('recruit_priority_'.$val['count']). '</span>';
 				} elseif($val['count'] !== 0) {
-					$tooltip[] = $val['decorate'].' '.$val['name'].': '.$val['count'];
+					$tooltip[] = $val['icon'].' '.$val['name'].': '.$val['count'];
 				}
 
 				//Roles
@@ -526,197 +425,41 @@ class recruitment_portal extends portal_generic {
 					foreach($val['roles'] as $roleid => $rval){
 						if ($rval['count'] !== 0){
 							if($blnPriorities){
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': <span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
+								$tooltip[] = $rval['icon'].' '.$rval['name'].': <span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
 							} else {
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': '.$rval['count'];
+								$tooltip[] = $rval['icon'].' '.$rval['name'].': '.$rval['count'];
 							}
 						}	
 					}
 				}
-		
-				//Talents
-				foreach($val['talents'] as $talentid => $rval){
-					if ($rval['count'] !== 0){
+				
+				//Childs
+				if ($val['childs_count'] !== 0){
+					foreach($val['childs'] as $childid => $rval){
+						if ($rval['count'] !== 0){
 							if($blnPriorities){
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': <span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
+								$tooltip[] = $rval['icon'].' '.$rval['name'].': <span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
 							} else {
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': '.$rval['count'];
+								$tooltip[] = $rval['icon'].' '.$rval['name'].': '.$rval['count'];
 							}
-					}
-						
-					//Talent-Roles
-					if ($rval['roles_count'] !== 0){
-						foreach($rval['roles'] as $roleid => $rrval){
-							if ($rrval['count'] !== 0){
-								if($blnPriorities){
-									$tooltip[] = $rval['decorate'].' '.$rval['name'].' - '.$rrval['decorate'].' '.$rrval['name'].': <span class="'.$this->handle_cssclass($rrval['count']).'">'. $this->user->lang('recruit_priority_'.$rrval['count']). '</span>';
-								} else {
-									$tooltip[] = $rval['decorate'].' '.$rval['name'].' - '.$rrval['decorate'].' '.$rrval['name'].': '.$rrval['count'];
-								}
-							}
-						}
-					}
+						}	
+					}		
 				}
 				
 				$strTooltip = implode("<br />", $tooltip);
-				$out .= new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().(($val['decorate_big']) ? $val['decorate_big'] : $val['decorate']).'</a></span>', "my" => $ttpos));
-				//$out = '<div class="rc_class tt_rc_class_'.$classid.'">'.(($val['decorate_big']) ? $val['decorate_big'] : $val['decorate']).'</div>';
+				$out .= new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</a></span>', "my" => $ttpos));
+				//$out = '<div class="rc_class tt_rc_class_'.$classid.'">'.(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</div>';
 				//$this->jquery->qtip(".tool_rc_class_".$classid, $strTooltip);
 				
 			} else {
-				$out .= '<span class="rc_class rc_gray">'.(($val['decorate_big']) ? $val['decorate_big'] : $val['decorate']).'</span>';
+				if ($val['name'] == "") continue;
+				$out .= '<span class="rc_class rc_gray">'.(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</span>';
 			}
 		}
 		$out .='<div class="clear"></div></div>';
 		return $out;
 	}
-	
-	private function output_mini_icons($arrContent, $blnPriorities){
-		$this->tpl->add_css('.rec_middle{color:#ff7c0a;}
-			.rc_class_ct {
-				float: left;
-				margin-bottom: 4px;
-				margin-right: 8px;
-			}
-				
-			.rc_class, .rc_talent {
-				float: left;
-			}
-		
-			.rc_class img {
-				max-height: 36px;
-			}
-			
-			.rc_talent {
-				margin-top: 10px;
-				margin-left: 4px;
-			}	
-				
-			.rc_talent img {
-				max-height: 20px;
-			}
-		
-			.rc_gray img {
-				-moz-opacity: 0.30;
-				opacity: 0.30;
-				-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=30);
-			}
-		');
-		
-		//Tooltip position:
-		switch($this->position){
-			case 'left': $ttpos = 'top left';
-			break;
-			case 'right': $ttpos = 'top right';
-			break;
-			default: $ttpos = 'top bottom';
-		}
-		
-		$out = '<div'.(($this->config('2columns') == 1) ? ' style="width: 255px;"' : '').'>';
-		foreach($arrContent as $classid => $val){
-			$tooltip = array();
-			if ($val['count'] !== 0 || $val['roles_count'] !== 0 || $val['talents_count'] !== 0 || $val['talents_roles_count'] !== 0){
-				$out .= '<div class="rc_class_ct">';
-				
-				$tooltip = false;
-				if($blnPriorities && $val['count'] !== 0){
-					$tooltip[] = $val['decorate'].' '.$val['name'].': <span class="'.$this->handle_cssclass($val['count']).'">'. $this->user->lang('recruit_priority_'.$val['count']). '</span>';
-				} elseif($val['count'] !== 0) {
-					$tooltip[] = $val['decorate'].' '.$val['name'].': '.$val['count'];
-				}
 
-				//Roles
-				if ($val['roles_count'] !== 0 && count($val['talents']) != 0){
-					foreach($val['roles'] as $roleid => $rval){
-						if ($rval['count'] !== 0){
-							if($blnPriorities){
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': <span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
-							} else {
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': '.$rval['count'];
-							}
-						}
-					}
-				}
-				
-				if (count($tooltip)){
-					$out .= new htooltip('tt_recrui2', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_class">'.$this->get_recruitment_link().(($val['decorate_big']) ? $val['decorate_big'] : $val['decorate']).'</a></div>', "my" => $ttpos));
-				} else {
-					$out .= '<div class="rc_class"><a href="'.$this->get_recruitment_link().'">'.(($val['decorate_big']) ? $val['decorate_big'] : $val['decorate']).'</a></div>';
-				}
-				
-		
-				//Roles
-				if (count($val['talents']) == 0){
-					foreach($val['roles'] as $roleid => $rval){
-						$tooltip = array();
-						if ($rval['count'] !== 0){
-							if($blnPriorities){
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': <span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
-							} else {
-								$tooltip[] = $rval['decorate'].' '.$rval['name'].': '.$rval['count'];
-							}
-						}
-						
-						if (count($tooltip)){
-							$out .= new htooltip('tt_recrui3', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
-						} else {
-							$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
-						}
-						
-					}
-				}
-		
-				//Talents
-				foreach($val['talents'] as $talentid => $rval){
-					$tooltip = array();
-					if ($rval['count'] !== 0){
-						if($blnPriorities){
-							$tooltip[] = $rval['decorate'].' '.$rval['name'].': <span class="'.$this->handle_cssclass($rval['count']).'">'. $this->user->lang('recruit_priority_'.$rval['count']). '</span>';
-						} else {
-							$tooltip[] = $rval['decorate'].' '.$rval['name'].': '.$rval['count'];
-						}
-					}
-					
-					//Talent-Roles
-					if ($rval['roles_count'] !== 0){
-						foreach($rval['roles'] as $roleid => $rrval){
-							if ($rrval['count'] !== 0){
-								if($blnPriorities){
-									$tooltip[] = $rval['decorate'].' '.$rval['name'].' - '.$rrval['decorate'].' '.$rrval['name'].': <span class="'.$this->handle_cssclass($rrval['count']).'">'. $this->user->lang('recruit_priority_'.$rrval['count']). '</span>';
-								} else {
-									$tooltip[] = $rval['decorate'].' '.$rval['name'].' - '.$rrval['decorate'].' '.$rrval['name'].': '.$rrval['count'];
-								}
-							}
-						}
-					}
-					if (count($tooltip)){
-						$out .= new htooltip('tt_recrui4', array('content' => implode("<br />", $tooltip), 'label' => '<div class="rc_talent">'.$this->get_recruitment_link().$rval['decorate'].'</a></div>', "my" => $ttpos));
-					} else {
-						$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
-					}
-					
-				}
-
-		
-				$out .= '</div>';
-			} else {
-				$out .= '<div class="rc_class_ct">';
-				$out .= '	<div class="rc_class rc_gray">'.(($val['decorate_big']) ? $val['decorate_big'] : $val['decorate']).'</div>';
-				if (count($val['talents'])) {
-					foreach($val['talents'] as $talentid => $rval){
-						$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
-					}
-				} else {
-					foreach($val['roles'] as $talentid => $rval){
-						$out .= '<div class="rc_talent rc_gray">'.$rval['decorate'].'</div>';
-					}
-				}
-				$out .= '</div>';
-			}
-		}
-		$out .='<div class="clear"></div></div>';
-		return $out;
-	}
 	
 	private function handle_cssclass($priority){
 		switch($priority){
