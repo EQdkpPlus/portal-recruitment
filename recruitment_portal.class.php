@@ -314,7 +314,7 @@ class recruitment_portal extends portal_generic {
 		}
 		
 		$arrSettings = $this->build_count_array($arrClasses['data'],  $arrToDisplay, $intStopLevel);
-		d($arrSettings);
+
 		$arrStyles = array(0 => 'classic', 1 => 'tooltip');
 		$intStyle = (int)$this->config('layout');
 		
