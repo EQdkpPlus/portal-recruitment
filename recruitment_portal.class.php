@@ -231,8 +231,11 @@ class recruitment_portal extends portal_generic {
 							'icon'		=> $this->game->decorate('roles', $role_id),
 							'count'		=> ($this->config($string.$key.'_role'.$role_id)) ? $this->config($string.$key.'_role'.$role_id) : 0,
 						);
-						
-						$intRoleCount += $arrOut[$string.$key.'_']['roles'] [$string.$key.'_role'.$role_id]['count'];
+						if ((int)$this->config('priority')){
+							if (strlen($this->config($string.$key.'_role'.$role_id))) $intRoleCount++;
+						} else {
+							$intRoleCount += $arrOut[$string.$key.'_']['roles'] [$string.$key.'_role'.$role_id]['count'];
+						}
 					} //close foreach
 				}
 				$arrOut[$string.$key.'_']['roles_count'] = $intRoleCount;
@@ -269,7 +272,12 @@ class recruitment_portal extends portal_generic {
 				);
 				if (!in_array($string.$key.'_', $arrSelected)) $arrOut['childs'][$string.$key.'_']['count'] = 0;
 				
-				$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];		
+				if ((int)$this->config('priority')){
+					$arrOut['count']++;
+				} else {
+					$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];	
+				}
+					
 				$arrResult = $this->build_child($val, $arrToDisplay, $level+1, $string.$key.'_', $orig_string);
 				$arrOut['childs'] = array_merge($arrOut['childs'], $arrResult['childs']);
 				$arrOut['count'] += $arrResult['count'];
@@ -283,7 +291,11 @@ class recruitment_portal extends portal_generic {
 						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
 				);
 				if (!in_array($string.$key.'_', $arrSelected)) $arrOut['childs'][$string.$key.'_']['count'] = 0;
-				$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];
+				if ((int)$this->config('priority')){
+					if (strlen($this->config($string.$key.'_'))) $arrOut['count']++;
+				} else {
+					$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];
+				}
 			}
 		}
 		
@@ -302,7 +314,7 @@ class recruitment_portal extends portal_generic {
 		}
 		
 		$arrSettings = $this->build_count_array($arrClasses['data'],  $arrToDisplay, $intStopLevel);
-				
+		d($arrSettings);
 		$arrStyles = array(0 => 'classic', 1 => 'tooltip');
 		$intStyle = (int)$this->config('layout');
 		
