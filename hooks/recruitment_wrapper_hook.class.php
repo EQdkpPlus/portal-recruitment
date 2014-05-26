@@ -22,10 +22,9 @@ if (!defined('EQDKP_INC')){
 
 if (!class_exists('recruitment_wrapper_hook')){
 	class recruitment_wrapper_hook extends gen_class{
-		public static $shortcuts = array('user', 'config');
-		
+
 		public function __construct($moduleID){
-			
+
 		}
 		
 		public function wrapper_hook($arrParams){
@@ -41,8 +40,4 @@ if (!class_exists('recruitment_wrapper_hook')){
 			return array('id'=>'Recruitment', 'data'=> $out);
 		}
 	}
-}
-
-if(version_compare(PHP_VERSION, '5.3.0', '<')) {
-	registry::add_const('short_recruitment_wrapper_hook', recruitment_wrapper_hook::$shortcuts);
 }
