@@ -46,7 +46,9 @@ class recruitment_portal extends portal_generic {
 	
 	protected $hooks = array(
 		array('wrapper', 'recruitment_wrapper_hook')
-	);	
+	);
+	
+	protected static $apiLevel = 20;
 
 	
 	public function get_settings($state){	
