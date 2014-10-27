@@ -259,6 +259,7 @@ class recruitment_portal extends portal_generic {
 		$string = ($orig_string) ? $orig_string : $string;
 		
 		$arrSelected = $this->config($string);
+		if (!is_array($arrSelected)) $arrSelected = array();
 		
 		if (!is_array($arrData)) return $arrOut;
 		
@@ -292,6 +293,7 @@ class recruitment_portal extends portal_generic {
 						'icon'		=> $this->game->decorate($arrToDisplay[$level], $val),
 						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
 				);
+				
 				if (!in_array($string.$key.'_', $arrSelected)) $arrOut['childs'][$string.$key.'_']['count'] = 0;
 				if ((int)$this->config('priority')){
 					if (strlen($this->config($string.$key.'_'))) $arrOut['count']++;
