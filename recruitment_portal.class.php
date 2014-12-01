@@ -208,6 +208,8 @@ class recruitment_portal extends portal_generic {
 			} elseif($level == $stop_level) {
 				if ($key == 0) continue;
 				
+				$arrSelected = $this->config($string.$key.'_');
+				
 				$arrOut[$string.$key.'_'] = array(
 						'key'	=> $string.$key.'_',
 						'type'	=> 'primary',
@@ -220,6 +222,8 @@ class recruitment_portal extends portal_generic {
 						'roles' => array(),
 						'roles_count' => 0,
 				);
+				
+				if (!in_array($string.$key.'_', $arrSelected)) $arrOut[$string.$key.'_']['count'] = 0;
 
 				//Add Roles
 				$arrRoles = $this->pdh->get('roles', 'memberroles', array($key));
@@ -233,6 +237,12 @@ class recruitment_portal extends portal_generic {
 							'icon'		=> $this->game->decorate('roles', $role_id),
 							'count'		=> ($this->config($string.$key.'_role'.$role_id)) ? $this->config($string.$key.'_role'.$role_id) : 0,
 						);
+						
+						if (!in_array($string.$key.'_role'.$role_id, $arrSelected)) {
+							$arrOut[$string.$key.'_']['roles'] [$string.$key.'_role'.$role_id]['count'] = 0;
+							continue;
+						}
+						
 						if ((int)$this->config('priority')){
 							if (strlen($this->config($string.$key.'_role'.$role_id))) $intRoleCount++;
 						} else {
@@ -249,7 +259,7 @@ class recruitment_portal extends portal_generic {
 				$arrOut[$string.$key.'_']['childs']		  = $arrChilds['childs'];
 			}
 		}
-	
+		
 		return $arrOut;
 	}
 	
@@ -273,12 +283,14 @@ class recruitment_portal extends portal_generic {
 						'icon'		=> $this->game->decorate($arrToDisplay[$level], $key),
 						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
 				);
-				if (!in_array($string.$key.'_', $arrSelected)) $arrOut['childs'][$string.$key.'_']['count'] = 0;
-				
-				if ((int)$this->config('priority')){
-					$arrOut['count']++;
+				if (!in_array($string.$key.'_', $arrSelected)) {
+					$arrOut['childs'][$string.$key.'_']['count'] = 0;
 				} else {
-					$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];	
+					if ((int)$this->config('priority')){
+						$arrOut['count']++;
+					} else {
+						$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];	
+					}
 				}
 					
 				$arrResult = $this->build_child($val, $arrToDisplay, $level+1, $string.$key.'_', $orig_string);
@@ -294,11 +306,14 @@ class recruitment_portal extends portal_generic {
 						'count'		=> ($this->config($string.$key.'_')) ? $this->config($string.$key.'_') : 0,
 				);
 				
-				if (!in_array($string.$key.'_', $arrSelected)) $arrOut['childs'][$string.$key.'_']['count'] = 0;
-				if ((int)$this->config('priority')){
-					if (strlen($this->config($string.$key.'_'))) $arrOut['count']++;
+				if (!in_array($string.$key.'_', $arrSelected)) {
+					$arrOut['childs'][$string.$key.'_']['count'] = 0;
 				} else {
-					$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];
+					if ((int)$this->config('priority')){
+						if (strlen($this->config($string.$key.'_'))) $arrOut['count']++;
+					} else {
+						$arrOut['count'] += $arrOut['childs'][$string.$key.'_']['count'];
+					}
 				}
 			}
 		}
