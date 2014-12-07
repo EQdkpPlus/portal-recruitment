@@ -60,6 +60,7 @@ class recruitment_portal extends portal_generic {
 		);
 		// Load the classes
 		$arrClasses = $this->game->get_recruitment_classes();
+
 		$arrToDisplay = $arrClasses['todisplay'];
 		
 		$strPrimaryClass = $this->game->get_primary_class();
@@ -71,7 +72,7 @@ class recruitment_portal extends portal_generic {
 		
 		$arrSettings = $this->build_settings($arrClasses['data'],  $arrToDisplay, $intStopLevel);
 		
-		foreach ($arrSettings as $key => $val){		
+		foreach ($arrSettings as $key => $val){			
 			if (!isset($val['options'])){
 				$settings[$key] = array(
 					'dir_lang'		=> $val['field']['icon'].' '.$val['field']['text'],
@@ -130,6 +131,8 @@ class recruitment_portal extends portal_generic {
 		$arrOut = array();
 		
 		foreach ($arrData as $key => $val) {
+			if ($key === 0) continue;
+			
 			if (is_array($val) && ($level < $stop_level)){
 				
 				$arrOut[$string.$key.'_']['field'] = array(
@@ -144,6 +147,7 @@ class recruitment_portal extends portal_generic {
 				$arrOut = array_merge($arrOut, $arrResult);
 	
 			} elseif($level == $stop_level) {
+				
 				$arrOut[$string.$key.'_']['field'] = array(
 					'type'	=> 'multiselect',
 					'text'	=>  $this->game->get_name($arrToDisplay[$level], ((!is_array($val)) ? $val : $key)),
