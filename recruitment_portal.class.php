@@ -64,6 +64,7 @@ class recruitment_portal extends portal_generic {
 		$arrToDisplay = $arrClasses['todisplay'];
 		
 		$strPrimaryClass = $this->game->get_primary_class();
+
 		
 		$intStopLevel = 0;
 		foreach($arrToDisplay as $key => $val){
@@ -131,6 +132,8 @@ class recruitment_portal extends portal_generic {
 		$arrOut = array();
 		
 		foreach ($arrData as $key => $val) {
+			//Change Key to integer
+			$key = intval($key);
 			if ($key === 0) continue;
 			
 			if (is_array($val) && ($level < $stop_level)){
@@ -196,6 +199,8 @@ class recruitment_portal extends portal_generic {
 		$arrOut = array();
 	
 		foreach ($arrData as $key => $val) {
+			$key = intval($key);
+			
 			if (is_array($val) && ($level < $stop_level)){
 	
 				$arrOut[$string.$key.'_'] = array(
@@ -227,7 +232,7 @@ class recruitment_portal extends portal_generic {
 						'roles_count' => 0,
 				);
 				
-				if (!in_array($string.$key.'_', $arrSelected)) $arrOut[$string.$key.'_']['count'] = 0;
+				if (!$arrSelected || !in_array($string.$key.'_', $arrSelected)) $arrOut[$string.$key.'_']['count'] = 0;
 
 				//Add Roles
 				$arrRoles = $this->pdh->get('roles', 'memberroles', array($key));
