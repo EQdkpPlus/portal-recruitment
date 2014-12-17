@@ -1,6 +1,6 @@
 <?php
 /*	Project:	EQdkp-Plus
- *	Package:	Recreuitment Portal Module
+ *	Package:	EQdkp-Plus Language File
  *	Link:		http://eqdkp-plus.eu
  *
  *	Copyright (C) 2006-2015 EQdkp-Plus Developer Team
@@ -19,29 +19,37 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-if ( !defined('EQDKP_INC') ){
-	header('HTTP/1.0 404 Not Found');exit;
+ 
+if (!defined('EQDKP_INC')) {
+	die('You cannot access this file directly.');
 }
 
-$lang['recruitment']					= 'Recruitment';
-$lang['recruitment_name']				= 'Recruitment';
-$lang['recruitment_desc']				= 'Searching for Members';
-$lang['recruitment_open']				= 'Searching Members';
-$lang['recruitment_contact']			= 'Apply';
-$lang['recruitment_noneed']				= 'There are no open slots at the moment.';
-$lang['recruitment_contact_type']		= 'Recruitment URL';
-$lang['recruitment_contact_type_help']	= 'If no URL is given, it will link to the contact email.';
-$lang['recruit_embedded']				= 'How to open given URL';
-$lang['recruit_embedded_help']			= 'If activated, the link opens embedded i an iframe.';
-$lang['recruit_priority']				= 'Use priority instead of numbers';
-$lang['recruit_layout']					= 'Layout';
-$lang['pm_recruitment_layout_2columns'] = 'Use 2 Columns';
+//Language: English	
+//Created by EQdkp Plus Translation Tool on  2014-12-17 21:28
+//File: portal/recruitment/language/english.php
+//Source-Language: german
 
-$lang['recruit_priority_high']			= 'high';
-$lang['recruit_priority_middle']		= 'medium';
-$lang['recruit_priority_low']			= 'low';
+$lang = array( 
+	"recruitment" => 'Recruitment',
+	"recruitment_name" => 'Recruitment',
+	"recruitment_desc" => 'Searching for Members',
+	"recruitment_open" => 'Searching Members',
+	"recruitment_contact" => 'Apply',
+	"recruitment_noneed" => 'There are no open slots at the moment.',
+	"recruitment_f_url" => 'URL for Recruitment',
+	"recruitment_f_help_url" => 'Insert a URL for your recruitment tool. If there is none URL, the module inserts the contact email address of EQdkp Plus.',
+	"recruitment_f_embed" => 'How should the URL be opened?',
+	"recruitment_f_help_embed" => 'Select how the inserted URL should be opened.',
+	"recruitment_f_priority" => 'Use priorities instead of numbers?',
+	"pm_recruitment_talentsorroles" => 'Talents or Roles?',
+	"pm_recruitment_talents" => 'Talents',
+	"pm_recruitment_roles" => 'Roles',
+	"recruitment_f_layout" => 'Layout',
+	"recruitment_f_2columns" => 'Two-Column Layout',
+	"recruit_priority_high" => 'high',
+	"recruit_priority_middle" => 'medium',
+	"recruit_priority_low" => 'low',
+	
+);
 
-$lang['pm_recruitment_talentsorroles']	= 'Talents or Roles?';
-$lang['pm_recruitment_talents']	= 'Talents';
-$lang['pm_recruitment_roles']	= 'Roles';
 ?>
