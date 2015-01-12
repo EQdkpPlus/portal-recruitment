@@ -360,7 +360,7 @@ class recruitment_portal extends portal_generic {
 	
 	private function output_classic($arrContent, $blnPriorities){
 		$this->tpl->add_css('.rec_middle{color:#ff7c0a;}');
-		$out = '<table width="100%" class="colorswitch hoverrows">';
+		$out = '<table class="table fullwidth colorswitch hoverrows">';
 		foreach($arrContent as $key => $val){
 			if ($val['type'] == 'text'){
 				$out.= '<tr><th colspan="2">'.$val['name'].'</th></tr>';
