@@ -32,7 +32,7 @@ class recruitment_portal extends portal_generic {
 	protected static $path		= 'recruitment';
 	protected static $data		= array(
 		'name'			=> 'Recruitment Module',
-		'version'		=> '2.0.1',
+		'version'		=> '2.0.2',
 		'author'		=> 'GodMod',
 		'icon'			=> 'fa-search-plus',
 		'contact'		=> EQDKP_PROJECT_URL,
@@ -213,7 +213,7 @@ class recruitment_portal extends portal_generic {
 						'icon'	=> $this->game->decorate($arrToDisplay[$level], $key),
 						'level'	=> $level,
 				);
-	
+					
 				$arrResult = $this->build_count_array($val, $arrToDisplay, $stop_level, $level+1, $string.$key.'_');
 				$arrOut = array_merge($arrOut, $arrResult);
 	
@@ -234,8 +234,8 @@ class recruitment_portal extends portal_generic {
 						'roles' => array(),
 						'roles_count' => 0,
 				);
-				
-				if (!$arrSelected || !in_array($string.$key.'_', $arrSelected)) $arrOut[$string.$key.'_']['count'] = 0;
+				if (!$arrSelected)  $arrOut[$string.$key.'_']['count'] = 0;
+				if (!in_array($string.$key.'_', $arrSelected) && !in_array($string.$key.'__val', $arrSelected) ) $arrOut[$string.$key.'_']['count'] = 0;
 
 				//Add Roles
 				$arrRoles = $this->pdh->get('roles', 'memberroles', array($key));
@@ -455,7 +455,8 @@ class recruitment_portal extends portal_generic {
 				continue;
 			}
 			
-			$tooltip = array();	
+			$tooltip = array();
+
 			if ($val['count'] !== 0 || $val['childs_count'] !== 0 || $val['roles_count'] !== 0){
 				if($blnPriorities && $val['count'] !== 0){
 					$tooltip[] = $val['icon'].' '.$val['name'].': <span class="'.$this->handle_cssclass($val['count']).'">'. $this->user->lang('recruit_priority_'.$val['count']). '</span>';
@@ -490,13 +491,13 @@ class recruitment_portal extends portal_generic {
 				}
 				
 				$strTooltip = implode("<br />", $tooltip);
-				$out .= new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</a></span>', "my" => $ttpos));
+				$out .= new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().preg_replace("#title\=\"(.*)\"#U", "", (($val['icon_big']) ? $val['icon_big'] : $val['icon'])).'</a></span>', "my" => $ttpos));
 				//$out = '<div class="rc_class tt_rc_class_'.$classid.'">'.(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</div>';
 				//$this->jquery->qtip(".tool_rc_class_".$classid, $strTooltip);
 				
 			} else {
 				if ($val['name'] == "") continue;
-				$out .= '<span class="rc_class rc_gray">'.(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</span>';
+				$out .= '<span class="rc_class rc_gray">'.((isset($val['icon_big']) && $val['icon_big']) ? $val['icon_big'] : $val['icon']).'</span>';
 			}
 		}
 		$out .='<div class="clear"></div></div>';
@@ -524,7 +525,8 @@ class recruitment_portal extends portal_generic {
 				break ;
 				case '2':
 				case '3':
-				case '4':  $path = $this->routing->build('external', 'recruitment');
+				case '4':  
+				case '5':	$path = $this->routing->build('external', 'recruitment');
 				break ;
 			}
 		
