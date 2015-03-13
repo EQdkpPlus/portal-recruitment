@@ -32,7 +32,7 @@ class recruitment_portal extends portal_generic {
 	protected static $path		= 'recruitment';
 	protected static $data		= array(
 		'name'			=> 'Recruitment Module',
-		'version'		=> '2.0.2',
+		'version'		=> '2.0.3',
 		'author'		=> 'GodMod',
 		'icon'			=> 'fa-search-plus',
 		'contact'		=> EQDKP_PROJECT_URL,
@@ -119,6 +119,7 @@ class recruitment_portal extends portal_generic {
 			'type'		=> 'textarea',
 			'cols'		=> '40',
 			'rows'		=> '4',
+			'codeinput'	=> true,
 		);
 		$settings['url']	= array(
 			'type'			=> 'text',
