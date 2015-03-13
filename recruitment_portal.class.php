@@ -114,6 +114,12 @@ class recruitment_portal extends portal_generic {
 			'type'			=> 'radio',
 			'class'			=> 'js_reload'
 		);
+		
+		$settings['text'] = array(
+			'type'		=> 'textarea',
+			'cols'		=> '40',
+			'rows'		=> '4',
+		);
 		$settings['url']	= array(
 			'type'			=> 'text',
 			'size'			=> 60,
@@ -361,6 +367,10 @@ class recruitment_portal extends portal_generic {
 	private function output_classic($arrContent, $blnPriorities){
 		$this->tpl->add_css('.rec_middle{color:#ff7c0a;}');
 		$out = '<table class="table fullwidth colorswitch hoverrows">';
+		if(strlen($this->config('text'))){
+			$out.= '<tr><td colspan="2">'.$this->config('text').'</td></tr>';
+		}
+		
 		foreach($arrContent as $key => $val){
 			if ($val['type'] == 'text'){
 				$out.= '<tr><th colspan="2">'.$val['name'].'</th></tr>';
@@ -417,7 +427,9 @@ class recruitment_portal extends portal_generic {
 			
 			}
 		}
-		$out .='<tr><td colspan="2">'.$this->get_recruitment_link().'<i class="fa fa-chevron-right"></i>'.$this->user->lang('recruitment_contact').'</a></td></tr></table>';
+		$recruitment_link = $this->get_recruitment_link();
+		if(strlen($recruitment_link)) $out .='<tr><td colspan="2">'.$recruitment_link.'<i class="fa fa-chevron-right"></i>'.$this->user->lang('recruitment_contact').'</a></td></tr>';
+		$out .= '</table>';
 		return $out;
 	}
 	
@@ -449,6 +461,10 @@ class recruitment_portal extends portal_generic {
 		}
 		
 		$out = '<div>';
+		if(strlen($this->config('text'))){
+			$out.= '<div>'.$this->config('text').'</div>';
+		}
+		
 		foreach($arrContent as $classid => $val){
 			if ($val['type'] == 'text'){
 				$out.= '<div><h3>'.$val['name'].'</h3></div>';
@@ -491,7 +507,7 @@ class recruitment_portal extends portal_generic {
 				}
 				
 				$strTooltip = implode("<br />", $tooltip);
-				$out .= new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().preg_replace("#title\=\"(.*)\"#U", "", (($val['icon_big']) ? $val['icon_big'] : $val['icon'])).'</a></span>', "my" => $ttpos));
+				$out .= new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().preg_replace("#title\=\"(.*)\"#U", "", (($val['icon_big']) ? $val['icon_big'] : $val['icon'])).((strlen($this->get_recruitment_link())) ? '</a>' : '').'</span>', "my" => $ttpos));
 				//$out = '<div class="rc_class tt_rc_class_'.$classid.'">'.(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</div>';
 				//$this->jquery->qtip(".tool_rc_class_".$classid, $strTooltip);
 				
@@ -531,11 +547,13 @@ class recruitment_portal extends portal_generic {
 			}
 		
 		}else{		//Link URL -> Email / guildrequest plugin
-			$path = "mailto:".$this->crypt->decrypt($this->config->get('admin_email'));
 			if ($this->pm->check('guildrequest', PLUGIN_INSTALLED)){
 				$path = $this->routing->build('WriteApplication');
 			}
 		}
+		
+		if(!strlen($path)) return "";
+		
 		$url = '<a href="'.$path.'" '.$target.'>' ;
 		return $url;
 	}

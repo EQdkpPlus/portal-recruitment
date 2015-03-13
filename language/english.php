@@ -49,7 +49,7 @@ $lang = array(
 	"recruit_priority_high" => 'high',
 	"recruit_priority_middle" => 'medium',
 	"recruit_priority_low" => 'low',
-	
+	'recruitment_f_text'=> 'Informationen',
 );
 
 ?>

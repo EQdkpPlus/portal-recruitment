@@ -39,7 +39,7 @@ $lang['pm_recruitment_talents']			= 'Talente';
 $lang['pm_recruitment_roles']			= 'Rollen';
 $lang['recruitment_f_layout']			= 'Darstellung';
 $lang['recruitment_f_2columns']			= 'Zweispaltige Darstellung';
-
+$lang['recruitment_f_text']				= 'Informationen';
 $lang['recruit_priority_high']			= 'Hoch';
 $lang['recruit_priority_middle']		= 'Mittel';
 $lang['recruit_priority_low']			= 'Niedrig';
