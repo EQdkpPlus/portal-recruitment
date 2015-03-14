@@ -31,16 +31,17 @@ if (!class_exists('recruitment_wrapper_hook')){
 		}
 		
 		public function wrapper_hook($arrParams){
-			if ($arrParams['id'] != 'recruitment') return false;
+			if ($arrParams['link'] != 'recruitment') return false;
+			$moduleID = intval($arrParams['id']);
 			
 			$out = array(
-				'url'	=> $this->config->get('pm_recruitment_url'),
+				'url'	=> $this->portal->get_module_config($moduleID,'url' ),
 				'title'	=> $this->user->lang('recruitment'),
-				'window'=> $this->config->get('pm_recruitment_embed'),
+				'window'=> $this->portal->get_module_config($moduleID,'embed' ),
 				'height'=> '4024',
 			);
-			
-			return array('id'=>'Recruitment', 'data'=> $out);
+
+			return array('id' => $moduleID, 'data'=> $out, 'link' => 'recruitment');
 		}
 	}
 }

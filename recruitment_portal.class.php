@@ -543,7 +543,7 @@ class recruitment_portal extends portal_generic {
 				case '2':
 				case '3':
 				case '4':  
-				case '5':	$path = $this->routing->build('external', 'recruitment');
+				case '5':	$path = $this->routing->build('external', 'recruitment', $this->id);
 				break ;
 			}
 		
