@@ -105,6 +105,7 @@ class recruitment_portal extends portal_generic {
 		}
 		
 		$a_linkMode= array(
+			'email'			=> $this->user->lang('user_sett_f_priv_userprofile_email'),
 			'0'				=> $this->user->lang('pk_set_link_type_self'),
 			'1'				=> $this->user->lang('pk_set_link_type_link'),
 			'2'				=> $this->user->lang('pk_set_link_type_iframe'),
@@ -535,6 +536,8 @@ class recruitment_portal extends portal_generic {
 		$target = '';
 		if (strlen($this->config('url')) > 1) {
 			switch ($this->config('embed')){
+				case 'email' : $path = 'mailto:'.$this->config('url');
+				break;
 				case '0':  $path = $this->config('url');
 				break ;
 				case '1':  $target = ' target="_blank"';
