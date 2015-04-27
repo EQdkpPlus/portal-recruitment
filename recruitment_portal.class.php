@@ -170,7 +170,7 @@ class recruitment_portal extends portal_generic {
 					'level'	=> $level,
 				);
 				
-				$arrOut[$string.$key.'_']['options'] = $this->build_dropdown($val, $arrToDisplay, $level+1, $string.$key.'_', $key);
+				$arrOut[$string.$key.'_']['options'] = $this->build_dropdown($val, $arrToDisplay, $level+1, $string.$key.'_', ((!is_array($val)) ? $val : $key));
 				
 				//Add Roles
 				$arrRoles = $this->pdh->get('roles', 'memberroles', array($key));
