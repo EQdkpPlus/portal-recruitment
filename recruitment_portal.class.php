@@ -242,8 +242,9 @@ class recruitment_portal extends portal_generic {
 						'roles' => array(),
 						'roles_count' => 0,
 				);
-				if (!$arrSelected)  $arrOut[$string.$key.'_']['count'] = 0;
-				if (!in_array($string.$key.'_', $arrSelected) && !in_array($string.$key.'__val', $arrSelected) ) $arrOut[$string.$key.'_']['count'] = 0;
+				if (!$arrSelected) {
+					$arrOut[$string.$key.'_']['count'] = 0;
+				} elseif (!in_array($string.$key.'_', $arrSelected) && !in_array($string.$key.'__val', $arrSelected) ) $arrOut[$string.$key.'_']['count'] = 0;
 
 				//Add Roles
 				$arrRoles = $this->pdh->get('roles', 'memberroles', array($key));
@@ -258,7 +259,7 @@ class recruitment_portal extends portal_generic {
 							'count'		=> ($this->config($string.$key.'_role'.$role_id)) ? $this->config($string.$key.'_role'.$role_id) : 0,
 						);
 						
-						if (!in_array($string.$key.'_role'.$role_id, $arrSelected)) {
+						if ($arrSelected && !in_array($string.$key.'_role'.$role_id, $arrSelected)) {
 							$arrOut[$string.$key.'_']['roles'] [$string.$key.'_role'.$role_id]['count'] = 0;
 							continue;
 						}
