@@ -32,7 +32,7 @@ class recruitment_portal extends portal_generic {
 	protected static $path		= 'recruitment';
 	protected static $data		= array(
 		'name'			=> 'Recruitment Module',
-		'version'		=> '2.0.4',
+		'version'		=> '2.0.5',
 		'author'		=> 'GodMod',
 		'icon'			=> 'fa-search-plus',
 		'contact'		=> EQDKP_PROJECT_URL,
@@ -450,7 +450,6 @@ class recruitment_portal extends portal_generic {
 			.rc_gray img {
 				-moz-opacity: 0.30;
 				opacity: 0.30;
-				-ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=30);
 			}
 		');
 		
