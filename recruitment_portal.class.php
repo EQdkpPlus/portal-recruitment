@@ -509,7 +509,7 @@ class recruitment_portal extends portal_generic {
 				}
 
 				$strTooltip = implode("<br />", $tooltip);
-				$out .= new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().preg_replace("#title\=\"(.*)\"#U", "", (($val['icon_big']) ? $val['icon_big'] : $val['icon'])).((strlen($this->get_recruitment_link())) ? '</a>' : '').'</span>', "my" => $ttpos));
+				$out .= (new htooltip('tt_recrui1', array('content' => $strTooltip, 'label' => '<span class="rc_class">'.$this->get_recruitment_link().preg_replace("#title\=\"(.*)\"#U", "", (($val['icon_big']) ? $val['icon_big'] : $val['icon'])).((strlen($this->get_recruitment_link())) ? '</a>' : '').'</span>', "my" => $ttpos)))->output();
 				//$out = '<div class="rc_class tt_rc_class_'.$classid.'">'.(($val['icon_big']) ? $val['icon_big'] : $val['icon']).'</div>';
 				//$this->jquery->qtip(".tool_rc_class_".$classid, $strTooltip);
 
