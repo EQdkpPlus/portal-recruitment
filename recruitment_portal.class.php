@@ -32,7 +32,7 @@ class recruitment_portal extends portal_generic {
 	protected static $path		= 'recruitment';
 	protected static $data		= array(
 			'name'			=> 'Recruitment Module',
-			'version'		=> '2.0.6',
+			'version'		=> '2.0.7',
 			'author'		=> 'GodMod',
 			'icon'			=> 'fa-search-plus',
 			'contact'		=> EQDKP_PROJECT_URL,
@@ -145,7 +145,8 @@ class recruitment_portal extends portal_generic {
 		foreach ($arrData as $key => $val) {
 			//Change Key to integer
 			$key = intval($key);
-			if ($key === 0) continue;
+			//hide classes with id 0 (unknown)
+			if ($key === 0 && intval($val) === 0) continue;
 				
 			if (is_array($val) && ($level < $stop_level)){
 
