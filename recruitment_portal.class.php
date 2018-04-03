@@ -32,7 +32,7 @@ class recruitment_portal extends portal_generic {
 	protected static $path		= 'recruitment';
 	protected static $data		= array(
 			'name'			=> 'Recruitment Module',
-			'version'		=> '2.0.7',
+			'version'		=> '2.0.8',
 			'author'		=> 'GodMod',
 			'icon'			=> 'fa-search-plus',
 			'contact'		=> EQDKP_PROJECT_URL,
@@ -227,7 +227,7 @@ class recruitment_portal extends portal_generic {
 				$arrOut = array_merge($arrOut, $arrResult);
 
 			} elseif($level == $stop_level) {
-				if ($key == 0) continue;
+				if ($key === 0 && $val === 0) continue;
 
 				$arrSelected = $this->config($string.$key.'_');
 
@@ -345,6 +345,7 @@ class recruitment_portal extends portal_generic {
 
 	public function output() {
 		$arrClasses = $this->game->get_recruitment_classes();
+		
 		$arrToDisplay = $arrClasses['todisplay'];
 
 		$strPrimaryClass = $this->game->get_primary_class();
