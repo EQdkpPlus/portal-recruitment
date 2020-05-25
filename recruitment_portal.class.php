@@ -558,7 +558,7 @@ class recruitment_portal extends portal_generic {
 			}
 		}
 
-		if(!strlen($path)) return "";
+		if(!isset($path) || !strlen($path)) return "";
 
 		$url = '<a href="'.$path.'" '.$target.'>' ;
 		return $url;
